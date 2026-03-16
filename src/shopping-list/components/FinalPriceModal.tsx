@@ -1,0 +1,113 @@
+"use client"
+
+import { useState, useEffect } from "react"
+import { createPortal } from "react-dom"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { faXmark, faEuroSign, faCheckCircle } from "@fortawesome/free-solid-svg-icons"
+
+interface FinalPriceModalProps {
+  isOpen: boolean
+  onClose: () => void
+  onConfirm: (price: number) => Promise<void>
+  listName: string
+}
+
+export default function FinalPriceModal({ isOpen, onClose, onConfirm, listName }: FinalPriceModalProps) {
+  const [price, setPrice] = useState<string>("")
+  const [isLoading, setIsLoading] = useState(false)
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  if (!isOpen || !mounted) return null
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    const numPrice = parseFloat(price)
+    if (isNaN(numPrice)) return
+
+    setIsLoading(true)
+    try {
+      await onConfirm(numPrice)
+      onClose()
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  return createPortal(
+    <div 
+      className="fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-300"
+      onClick={onClose}
+    >
+      <div 
+        className="bg-white rounded-[2.5rem] p-8 md:p-10 w-full max-w-md shadow-2xl border border-white/50 backdrop-blur-xl animate-in zoom-in slide-in-from-bottom-4 duration-500 relative overflow-y-auto max-h-[90vh]"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Abstract Background Decor */}
+        <div className="absolute -top-24 -right-24 w-48 h-48 bg-indigo-50 rounded-full blur-3xl opacity-50"></div>
+        <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-emerald-50 rounded-full blur-3xl opacity-50"></div>
+
+        <div className="relative z-10 text-center">
+          <div className="w-20 h-20 bg-indigo-50 text-indigo-500 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-inner rotate-3 transition-transform hover:rotate-0 duration-500">
+            <FontAwesomeIcon icon={faEuroSign} className="text-3xl" />
+          </div>
+
+          <h2 className="text-3xl font-black text-slate-800 mb-2 leading-tight">
+            ¡Compra Finalizada!
+          </h2>
+          <p className="text-slate-500 font-medium mb-10 px-4">
+            ¿Cuál ha sido el precio final para <span className="text-indigo-600 font-bold">{listName}</span>?
+          </p>
+
+          <form onSubmit={handleSubmit} className="space-y-8">
+            <div className="relative flex flex-col items-center">
+              <div className="relative w-full">
+                <input
+                  type="number"
+                  step="0.01"
+                  autoFocus
+                  value={price}
+                  onChange={(e) => setPrice(e.target.value)}
+                  placeholder="0.00"
+                  required
+                  className="w-full h-11 bg-white border-2 border-slate-100 rounded-xl px-4 text-slate-800 font-bold focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-400 transition-all text-sm appearance-none"
+                />
+                <div className="absolute left-8 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none">
+                   <FontAwesomeIcon icon={faEuroSign} className="text-2xl" />
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-4">
+              <button
+                type="button"
+                onClick={onClose}
+                className="flex-1 px-6 py-5 bg-slate-100/50 hover:bg-slate-100 text-slate-500 font-bold rounded-[2rem] transition-all cursor-pointer hover:scale-105 active:scale-95"
+              >
+                Omitir
+              </button>
+              <button
+                type="submit"
+                disabled={isLoading || !price}
+                className="flex-[2] bg-indigo-600 hover:bg-indigo-700 text-white font-black py-5 rounded-[2rem] shadow-xl shadow-indigo-200 hover:shadow-indigo-300 transition-all duration-300 active:scale-[0.98] cursor-pointer disabled:opacity-50 flex items-center justify-center gap-3"
+              >
+                {isLoading ? (
+                  <div className="w-6 h-6 border-4 border-white/30 border-t-white rounded-full animate-spin"></div>
+                ) : (
+                  <>
+                    <FontAwesomeIcon icon={faCheckCircle} />
+                    Guardar Total
+                  </>
+                )}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>,
+    document.body
+  )
+}

@@ -1,0 +1,57 @@
+"use client"
+
+import Link from "next/link"
+import { usePathname } from "next/navigation"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { faBasketShopping, faHouse, faListUl } from "@fortawesome/free-solid-svg-icons"
+
+export default function Header() {
+  const pathname = usePathname()
+
+  const navItems = [
+    { name: "Inicio", href: "/", icon: faHouse },
+    { name: "Catálogo", href: "/products", icon: faListUl },
+  ]
+
+  return (
+    <header className="fixed top-0 left-0 right-0 z-50 flex justify-center p-4">
+      <nav className="flex items-center justify-between w-full max-w-5xl px-6 py-3 bg-white/70 backdrop-blur-xl border border-white/40 rounded-[2rem] shadow-2xl shadow-slate-200/50">
+        {/* Logo Section */}
+        <Link href="/" className="flex items-center gap-3 group">
+          <div className="flex items-center justify-center w-10 h-10 bg-indigo-600 rounded-2xl shadow-lg shadow-indigo-200 group-hover:scale-110 transition-transform duration-300">
+            <FontAwesomeIcon icon={faBasketShopping} className="text-white text-lg" />
+          </div>
+          <span className="text-xl font-black text-slate-800 tracking-tight group-hover:text-indigo-600 transition-colors">
+            Lista<span className="text-indigo-600 group-hover:text-slate-800">Compra</span>
+          </span>
+        </Link>
+
+        {/* Navigation Links */}
+        <div className="flex items-center gap-2">
+          {navItems.map((item) => {
+            const isActive = pathname === item.href
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 ${
+                  isActive
+                    ? "bg-indigo-50 text-indigo-700 shadow-sm"
+                    : "text-slate-500 hover:text-slate-800 hover:bg-slate-50"
+                }`}
+              >
+                <FontAwesomeIcon icon={item.icon} className={`text-base ${isActive ? "text-indigo-600" : "text-slate-400"}`} />
+                <span className="hidden sm:inline">{item.name}</span>
+              </Link>
+            )
+          })}
+        </div>
+
+        {/* Right Section (Extra Space for future User Profile etc) */}
+        <div className="hidden md:block w-32 text-right">
+           <span className="text-[10px] font-black uppercase text-slate-300 tracking-wider">Versión 0.1</span>
+        </div>
+      </nav>
+    </header>
+  )
+}
