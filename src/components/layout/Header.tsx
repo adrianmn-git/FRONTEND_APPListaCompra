@@ -4,20 +4,24 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faBasketShopping, faHouse, faListUl } from "@fortawesome/free-solid-svg-icons"
+import { useI18n } from "@/i18n/hooks/useI18n"
+import LanguageSelector from "@/i18n/components/LanguageSelector"
+import { UserMenu } from "@/auth/components/UserMenu"
 
 export default function Header() {
   const pathname = usePathname()
+  const { t } = useI18n()
 
   const navItems = [
-    { name: "Inicio", href: "/", icon: faHouse },
-    { name: "Catálogo", href: "/products", icon: faListUl },
+    { name: t("nav.home", { defaultValue: 'Home' }), href: "/", icon: faHouse },
+    { name: t("nav.catalog", { defaultValue: 'Catalog' }), href: "/products", icon: faListUl },
   ]
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 flex justify-center p-4">
-      <nav className="flex items-center justify-between w-full max-w-5xl px-6 py-3 bg-white/70 backdrop-blur-xl border border-white/40 rounded-[2rem] shadow-2xl shadow-slate-200/50">
+      <nav className="flex items-center justify-between w-full max-w-7xl px-8 py-3.5 bg-white/70 backdrop-blur-xl border border-white/40 rounded-[2rem] shadow-2xl shadow-slate-200/50">
         {/* Logo Section */}
-        <Link href="/" className="flex items-center gap-3 group">
+        <Link href="/" className="flex items-center gap-4 group">
           <div className="flex items-center justify-center w-10 h-10 bg-indigo-600 rounded-2xl shadow-lg shadow-indigo-200 group-hover:scale-110 transition-transform duration-300">
             <FontAwesomeIcon icon={faBasketShopping} className="text-white text-lg" />
           </div>
@@ -27,14 +31,14 @@ export default function Header() {
         </Link>
 
         {/* Navigation Links */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-4">
           {navItems.map((item) => {
             const isActive = pathname === item.href
             return (
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 ${
+                className={`flex items-center gap-2.5 px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 ${
                   isActive
                     ? "bg-indigo-50 text-indigo-700 shadow-sm"
                     : "text-slate-500 hover:text-slate-800 hover:bg-slate-50"
@@ -47,9 +51,15 @@ export default function Header() {
           })}
         </div>
 
-        {/* Right Section (Extra Space for future User Profile etc) */}
-        <div className="hidden md:block w-32 text-right">
-           <span className="text-[10px] font-black uppercase text-slate-300 tracking-wider">Versión 0.1</span>
+        {/* Right Section */}
+        <div className="flex items-center gap-6">
+          <LanguageSelector variant="header" />
+          <UserMenu />
+          <div className="hidden lg:block text-right">
+            <span className="text-[10px] font-black uppercase text-slate-300 tracking-wider">
+              {t("common.version", { defaultValue: 'Version' })} 0.2
+            </span>
+          </div>
         </div>
       </nav>
     </header>

@@ -4,6 +4,8 @@ import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faExclamationTriangle, faTrashAlt, faTimes } from '@fortawesome/free-solid-svg-icons';
 
+import { useI18n } from '@/i18n/hooks/useI18n';
+
 interface ConfirmModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -21,10 +23,14 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
   onConfirm,
   title,
   message,
-  confirmText = 'Confirmar',
-  cancelText = 'Cancelar',
+  confirmText,
+  cancelText,
   type = 'danger'
 }) => {
+  const { t } = useI18n();
+  const finalConfirmText = confirmText || t("common.confirm", { defaultValue: 'Confirm' });
+  const finalCancelText = cancelText || t("common.cancel", { defaultValue: 'Cancel' });
+
   if (!isOpen) return null;
 
   const themes = {
@@ -70,7 +76,7 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
             <FontAwesomeIcon icon={theme.icon} size="2x" />
           </div>
 
-          <h3 className="mb-2 text-xl font-black text-slate-800 tracking-tight">
+          <h3 className="mb-2 text-2xl font-black text-slate-800 tracking-tight">
             {title}
           </h3>
           
@@ -78,21 +84,21 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
             {message}
           </p>
 
-          <div className="flex w-full gap-3 font-bold">
+          <div className="flex flex-col sm:flex-row w-full gap-3 pt-4">
             <button
               onClick={onClose}
-              className="flex-1 rounded-2xl border-2 border-slate-100 bg-white py-4 text-slate-500 hover:bg-slate-50 active:scale-95 transition-all"
+              className="flex-1 px-6 py-4 bg-slate-50 hover:bg-slate-100 text-slate-600 font-bold rounded-2xl transition-all cursor-pointer"
             >
-              {cancelText}
+              {finalCancelText}
             </button>
             <button
               onClick={() => {
                 onConfirm();
                 onClose();
               }}
-              className={`flex-1 rounded-2xl py-4 text-white shadow-lg active:scale-95 transition-all ${theme.buttonBg}`}
+              className={`flex-[2] py-4 text-white font-bold rounded-2xl shadow-lg active:scale-[0.98] transition-all cursor-pointer ${theme.buttonBg}`}
             >
-              {confirmText}
+              {finalConfirmText}
             </button>
           </div>
         </div>

@@ -14,75 +14,15 @@ import {
   faScaleBalanced, faWeightHanging, faFlask, faBottleDroplet
 } from '@fortawesome/free-solid-svg-icons'
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core'
-
-const UNIT_LABELS: Record<UnitType, string> = {
-  unit: 'unidad/es',
-  kg: 'Kg',
-  g: 'g',
-  l: 'L',
-  ml: 'ml',
-}
-
-const UNIT_THEMES: Record<UnitType, { icon: IconDefinition; color: string }> = {
-  unit: { icon: faBox, color: 'bg-slate-50 text-slate-600 border-slate-100' },
-  g: { icon: faScaleBalanced, color: 'bg-amber-50 text-amber-600 border-amber-100' },
-  kg: { icon: faWeightHanging, color: 'bg-orange-50 text-orange-600 border-orange-100' },
-  ml: { icon: faBottleDroplet, color: 'bg-blue-50 text-blue-600 border-blue-100' },
-  l: { icon: faFlask, color: 'bg-indigo-50 text-indigo-600 border-indigo-100' },
-}
+import { useI18n } from '@/i18n/hooks/useI18n'
 
 const CATEGORY_ICONS: Record<string, IconDefinition> = {
-  fruit: faAppleWhole,
-  vegetables: faCarrot,
-  meat: faDrumstickBite,
-  fish: faFish,
-  dairy: faGlassWater,
-  eggs: faEgg,
-  bread: faBreadSlice,
-  cereals: faBowlFood,
-  pasta_rice: faUtensils,
-  legumes: faSeedling,
-  frozen: faIcicles,
-  canned: faBoxArchive,
-  snacks: faCookie,
-  sweets: faCandyCane,
-  sauces: faJar,
-  spices: faPepperHot,
-  oil_vinegar: faOilCan,
-  drinks: faGlassWhiskey,
-  alcohol: faWineGlass,
-  cleaning: faBroom,
-  hygiene: faSoap,
-  baby: faBaby,
-  pets: faPaw,
-  other: faBox,
-}
-
-const CATEGORY_LABELS: Record<string, string> = {
-  fruit: 'Frutas y Verduras',
-  vegetables: 'Frutas y Verduras',
-  meat: 'Carne y Pescado',
-  fish: 'Carne y Pescado',
-  dairy: 'Lácteos y Huevos',
-  eggs: 'Lácteos y Huevos',
-  bread: 'Panadería',
-  cereals: 'Despensa',
-  pasta_rice: 'Despensa',
-  legumes: 'Despensa',
-  frozen: 'Congelados',
-  canned: 'Conservas',
-  snacks: 'Snacks',
-  sweets: 'Dulces',
-  sauces: 'Salsas',
-  spices: 'Especias',
-  oil_vinegar: 'Aceites y Vinagres',
-  drinks: 'Bebidas',
-  alcohol: 'Bebidas Alcohólicas',
-  cleaning: 'Limpieza',
-  hygiene: 'Higiene',
-  baby: 'Bebé',
-  pets: 'Mascotas',
-  other: 'Otros',
+  fruit: faAppleWhole, vegetables: faCarrot, meat: faDrumstickBite, fish: faFish,
+  dairy: faGlassWater, eggs: faEgg, bread: faBreadSlice, cereals: faBowlFood,
+  pasta_rice: faUtensils, legumes: faSeedling, frozen: faIcicles, canned: faBoxArchive,
+  snacks: faCookie, sweets: faCandyCane, sauces: faJar, spices: faPepperHot,
+  oil_vinegar: faOilCan, drinks: faGlassWhiskey, alcohol: faWineGlass, cleaning: faBroom,
+  hygiene: faSoap, baby: faBaby, pets: faPaw, other: faBox,
 }
 
 interface Props {
@@ -92,6 +32,38 @@ interface Props {
 export default function ShoppingListItemCard({ item }: Props) {
   const { updateItem, removeItem } = useShoppingListItems()
   const { products } = useProduct()
+  const { t } = useI18n()
+
+  const UNIT_LABELS: Record<UnitType, string> = {
+    unit: t("units.unit", { defaultValue: 'Unit' }),
+    kg: t("units.kg", { defaultValue: 'kg' }),
+    g: t("units.g", { defaultValue: 'g' }),
+    l: t("units.l", { defaultValue: 'L' }),
+    ml: t("units.ml", { defaultValue: 'ml' }),
+  }
+
+  const CATEGORY_LABELS: Record<string, string> = {
+    fruit: t("categories.fruit", { defaultValue: 'Fruit' }), vegetables: t("categories.fruit", { defaultValue: 'Fruit' }),
+    meat: t("categories.meat", { defaultValue: 'Meat' }), fish: t("categories.meat", { defaultValue: 'Meat' }),
+    dairy: t("categories.dairy", { defaultValue: 'Dairy' }), eggs: t("categories.dairy", { defaultValue: 'Dairy' }),
+    bread: t("categories.bread", { defaultValue: 'Bread' }), cereals: t("categories.canned", { defaultValue: 'Canned & Grains' }),
+    pasta_rice: t("categories.canned", { defaultValue: 'Canned & Grains' }), legumes: t("categories.canned", { defaultValue: 'Canned & Grains' }),
+    frozen: t("categories.frozen", { defaultValue: 'Frozen' }), canned: t("categories.canned", { defaultValue: 'Canned & Grains' }),
+    snacks: t("categories.snacks", { defaultValue: 'Snacks' }), sweets: t("categories.sweets", { defaultValue: 'Sweets' }),
+    sauces: t("categories.sauces", { defaultValue: 'Sauces' }), spices: t("categories.spices", { defaultValue: 'Spices' }),
+    oil_vinegar: t("categories.oil_vinegar", { defaultValue: 'Oil & Vinegar' }), drinks: t("categories.drinks", { defaultValue: 'Drinks' }),
+    alcohol: t("categories.drinks", { defaultValue: 'Drinks' }), cleaning: t("categories.cleaning", { defaultValue: 'Cleaning' }),
+    hygiene: t("categories.hygiene", { defaultValue: 'Hygiene' }), baby: t("categories.baby", { defaultValue: 'Baby' }),
+    pets: t("categories.pets", { defaultValue: 'Pets' }), other: t("categories.other", { defaultValue: 'Other' }),
+  }
+
+  const UNIT_THEMES: Record<UnitType, { icon: IconDefinition; color: string }> = {
+    unit: { icon: faBox, color: 'bg-slate-50 text-slate-600 border-slate-100' },
+    g: { icon: faScaleBalanced, color: 'bg-amber-50 text-amber-600 border-amber-100' },
+    kg: { icon: faWeightHanging, color: 'bg-orange-50 text-orange-600 border-orange-100' },
+    ml: { icon: faBottleDroplet, color: 'bg-blue-50 text-blue-600 border-blue-100' },
+    l: { icon: faFlask, color: 'bg-indigo-50 text-indigo-600 border-indigo-100' },
+  }
 
   // Resolve product info if the API only returns an ID or if info is missing
   const productInfo = typeof item.product === 'object' && item.product !== null
@@ -132,7 +104,7 @@ export default function ShoppingListItemCard({ item }: Props) {
       <div className="flex flex-col min-w-0 flex-1">
         <span className={`font-bold text-sm transition-all duration-200 truncate pr-2 ${item.picked_up ? 'text-slate-400 line-through' : 'text-slate-700'
           }`}>
-          {productInfo?.name ? productInfo.name.charAt(0).toUpperCase() + productInfo.name.slice(1) : 'Cargando...'}
+          {productInfo?.name ? productInfo.name.charAt(0).toUpperCase() + productInfo.name.slice(1) : t("common.loading", { defaultValue: 'Loading...' })}
         </span>
         {productInfo?.category && (
           <span className="text-[10px] font-semibold text-slate-400 uppercase">
@@ -154,7 +126,7 @@ export default function ShoppingListItemCard({ item }: Props) {
       {/* Controls Container (Quantity & Delete) */}
       <div className="item-controls flex items-center gap-3 shrink-0" onClick={(e) => e.stopPropagation()}>
         {/* 4. Quantity Selector */}
-        <div className="flex items-center gap-1 bg-slate-50 border border-slate-100 rounded-xl p-0.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+        <div className="flex items-center gap-1 bg-slate-50 border border-slate-100 rounded-xl p-0.5 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-200">
           <button
             onClick={() => handleQuantityChange(-1)}
             disabled={item.picked_up || item.quantity <= 1}

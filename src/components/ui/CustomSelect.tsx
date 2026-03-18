@@ -5,6 +5,7 @@ import { createPortal } from "react-dom"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faChevronDown, faCheck, faSearch } from "@fortawesome/free-solid-svg-icons"
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core"
+import { useI18n } from "@/i18n/hooks/useI18n"
 
 export interface CustomSelectOption<T> {
   value: T
@@ -37,6 +38,7 @@ export default function CustomSelect<T extends string | number>({
   const searchInputRef = useRef<HTMLInputElement>(null)
   const [dropdownPos, setDropdownPos] = useState({ top: 0, left: 0, width: 0 })
   const [mounted, setMounted] = useState(false)
+  const { t } = useI18n()
 
   useEffect(() => {
     setMounted(true)
@@ -145,7 +147,7 @@ export default function CustomSelect<T extends string | number>({
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Buscar..."
+                  placeholder={t("common.search", { defaultValue: 'Search...' })}
                   className="w-full pl-8 pr-4 py-2 bg-slate-50 border border-slate-100 rounded-[0.8rem] text-xs font-bold text-slate-700 focus:outline-none focus:border-indigo-300 transition-all placeholder:text-slate-400"
                 />
                 <FontAwesomeIcon 
@@ -159,7 +161,7 @@ export default function CustomSelect<T extends string | number>({
           <div className="p-1.5 max-h-[250px] overflow-y-auto">
             {filteredOptions.length === 0 ? (
               <div className="py-8 text-center">
-                <p className="text-[10px] font-black uppercase text-slate-400">Sin resultados</p>
+                <p className="text-[10px] font-black uppercase text-slate-400">{t("common.no_results", { defaultValue: 'No results' })}</p>
               </div>
             ) : (
               filteredOptions.map((option) => (

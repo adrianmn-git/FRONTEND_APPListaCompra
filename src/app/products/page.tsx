@@ -20,50 +20,52 @@ import {
 } from '@fortawesome/free-solid-svg-icons'
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core'
 import CustomSelect, { CustomSelectOption } from '@/components/ui/CustomSelect'
-
-const CATEGORY_MAP: Record<string, { label: string; icon: IconDefinition; color: string }> = {
-  fruit: { label: 'Fruta', icon: faAppleWhole, color: 'bg-red-100 text-red-700 border-red-200' },
-  vegetables: { label: 'Verdura', icon: faCarrot, color: 'bg-emerald-100 text-emerald-700 border-emerald-200' },
-  meat: { label: 'Carne', icon: faDrumstickBite, color: 'bg-orange-100 text-orange-700 border-orange-200' },
-  fish: { label: 'Pescado', icon: faFish, color: 'bg-blue-100 text-blue-700 border-blue-200' },
-  dairy: { label: 'Lácteos', icon: faGlassWater, color: 'bg-indigo-100 text-indigo-700 border-indigo-200' },
-  eggs: { label: 'Huevos', icon: faEgg, color: 'bg-yellow-100 text-yellow-700 border-yellow-200' },
-  bread: { label: 'Panadería', icon: faBreadSlice, color: 'bg-amber-100 text-amber-700 border-amber-200' },
-  cereals: { label: 'Cereales', icon: faBowlFood, color: 'bg-stone-100 text-stone-700 border-stone-200' },
-  pasta_rice: { label: 'Pasta/Arroz', icon: faUtensils, color: 'bg-yellow-50 text-yellow-800 border-yellow-100' },
-  legumes: { label: 'Legumbres', icon: faSeedling, color: 'bg-brown-100 text-brown-700 border-brown-200' },
-  frozen: { label: 'Congelados', icon: faIcicles, color: 'bg-cyan-100 text-cyan-700 border-cyan-200' },
-  canned: { label: 'Conservas', icon: faBoxArchive, color: 'bg-zinc-100 text-zinc-700 border-zinc-200' },
-  snacks: { label: 'Snacks', icon: faCookie, color: 'bg-rose-100 text-rose-700 border-rose-200' },
-  sweets: { label: 'Dulces', icon: faCandyCane, color: 'bg-pink-100 text-pink-700 border-pink-200' },
-  sauces: { label: 'Salsas', icon: faJar, color: 'bg-red-50 text-red-800 border-red-100' },
-  spices: { label: 'Especias', icon: faPepperHot, color: 'bg-orange-50 text-orange-800 border-orange-100' },
-  oil_vinegar: { label: 'Aceites', icon: faOilCan, color: 'bg-yellow-100 text-yellow-900 border-yellow-200' },
-  drinks: { label: 'Bebidas', icon: faGlassWhiskey, color: 'bg-purple-100 text-purple-700 border-purple-200' },
-  alcohol: { label: 'Alcohol', icon: faWineGlass, color: 'bg-violet-100 text-violet-700 border-violet-200' },
-  cleaning: { label: 'Limpieza', icon: faBroom, color: 'bg-blue-50 text-blue-700 border-blue-100' },
-  hygiene: { label: 'Higiene', icon: faSoap, color: 'bg-teal-50 text-teal-700 border-teal-100' },
-  baby: { label: 'Bebé', icon: faBaby, color: 'bg-sky-100 text-sky-700 border-sky-200' },
-  pets: { label: 'Mascotas', icon: faPaw, color: 'bg-gray-200 text-gray-800 border-gray-300' },
-  other: { label: 'Otros', icon: faBox, color: 'bg-gray-100 text-gray-700 border-gray-200' },
-}
-
-const CATEGORIES_LIST: CustomSelectOption<string>[] = [
-  { value: 'all', label: 'Todas las categorías', icon: faFilter, color: 'bg-slate-100 text-slate-500' },
-  ...Object.entries(CATEGORY_MAP).map(([value, { label, icon, color }]) => ({
-    value,
-    label,
-    icon,
-    color
-  })),
-]
+import { useI18n } from '@/i18n/hooks/useI18n'
 
 export default function ProductsPage() {
   const router = useRouter()
   const { products, loadProducts, loading } = useProduct()
+  const { t } = useI18n()
 
   const [search, setSearch] = useState('')
   const [selectedCategory, setSelectedCategory] = useState<string>('all')
+
+  const CATEGORY_MAP: Record<string, { label: string; icon: IconDefinition; color: string }> = {
+    fruit: { label: t("categories.fruit", { defaultValue: 'Fruit' }), icon: faAppleWhole, color: 'bg-red-100 text-red-700 border-red-200' },
+    vegetables: { label: t("categories.fruit", { defaultValue: 'Fruit' }), icon: faCarrot, color: 'bg-emerald-100 text-emerald-700 border-emerald-200' },
+    meat: { label: t("categories.meat", { defaultValue: 'Meat' }), icon: faDrumstickBite, color: 'bg-orange-100 text-orange-700 border-orange-200' },
+    fish: { label: t("categories.meat", { defaultValue: 'Meat' }), icon: faFish, color: 'bg-blue-100 text-blue-700 border-blue-200' },
+    dairy: { label: t("categories.dairy", { defaultValue: 'Dairy' }), icon: faGlassWater, color: 'bg-indigo-100 text-indigo-700 border-indigo-200' },
+    eggs: { label: t("categories.dairy", { defaultValue: 'Dairy' }), icon: faEgg, color: 'bg-yellow-100 text-yellow-700 border-yellow-200' },
+    bread: { label: t("categories.bread", { defaultValue: 'Bread' }), icon: faBreadSlice, color: 'bg-amber-100 text-amber-700 border-amber-200' },
+    cereals: { label: t("categories.canned", { defaultValue: 'Canned & Grains' }), icon: faBowlFood, color: 'bg-stone-100 text-stone-700 border-stone-200' },
+    pasta_rice: { label: t("categories.canned", { defaultValue: 'Canned & Grains' }), icon: faUtensils, color: 'bg-yellow-50 text-yellow-800 border-yellow-100' },
+    legumes: { label: t("categories.canned", { defaultValue: 'Canned & Grains' }), icon: faSeedling, color: 'bg-brown-100 text-brown-700 border-brown-200' },
+    frozen: { label: t("categories.frozen", { defaultValue: 'Frozen' }), icon: faIcicles, color: 'bg-cyan-100 text-cyan-700 border-cyan-200' },
+    canned: { label: t("categories.canned", { defaultValue: 'Canned & Grains' }), icon: faBoxArchive, color: 'bg-zinc-100 text-zinc-700 border-zinc-200' },
+    snacks: { label: t("categories.snacks", { defaultValue: 'Snacks' }), icon: faCookie, color: 'bg-rose-100 text-rose-700 border-rose-200' },
+    sweets: { label: t("categories.sweets", { defaultValue: 'Sweets' }), icon: faCandyCane, color: 'bg-pink-100 text-pink-700 border-pink-200' },
+    sauces: { label: t("categories.sauces", { defaultValue: 'Sauces' }), icon: faJar, color: 'bg-red-50 text-red-800 border-red-100' },
+    spices: { label: t("categories.spices", { defaultValue: 'Spices' }), icon: faPepperHot, color: 'bg-orange-50 text-orange-800 border-orange-100' },
+    oil_vinegar: { label: t("categories.oil_vinegar", { defaultValue: 'Oil & Vinegar' }), icon: faOilCan, color: 'bg-yellow-100 text-yellow-900 border-yellow-200' },
+    drinks: { label: t("categories.drinks", { defaultValue: 'Drinks' }), icon: faGlassWhiskey, color: 'bg-purple-100 text-purple-700 border-purple-200' },
+    alcohol: { label: t("categories.drinks", { defaultValue: 'Drinks' }), icon: faWineGlass, color: 'bg-violet-100 text-violet-700 border-violet-200' },
+    cleaning: { label: t("categories.cleaning", { defaultValue: 'Cleaning' }), icon: faBroom, color: 'bg-blue-50 text-blue-700 border-blue-100' },
+    hygiene: { label: t("categories.hygiene", { defaultValue: 'Hygiene' }), icon: faSoap, color: 'bg-teal-50 text-teal-700 border-teal-100' },
+    baby: { label: t("categories.baby", { defaultValue: 'Baby' }), icon: faBaby, color: 'bg-sky-100 text-sky-700 border-sky-200' },
+    pets: { label: t("categories.pets", { defaultValue: 'Pets' }), icon: faPaw, color: 'bg-gray-200 text-gray-800 border-gray-300' },
+    other: { label: t("categories.other", { defaultValue: 'Other' }), icon: faBox, color: 'bg-gray-100 text-gray-700 border-gray-200' },
+  }
+
+  const CATEGORIES_LIST: CustomSelectOption<string>[] = useMemo(() => [
+    { value: 'all', label: t("filters.all", { defaultValue: 'All' }), icon: faFilter, color: 'bg-slate-100 text-slate-500' },
+    ...Object.entries(CATEGORY_MAP).map(([value, { label, icon, color }]) => ({
+      value,
+      label,
+      icon,
+      color
+    })),
+  ], [t])
 
   useEffect(() => {
     loadProducts()
@@ -107,19 +109,19 @@ export default function ProductsPage() {
             className="group flex items-center gap-2 text-slate-500 hover:text-slate-800 text-sm font-semibold mb-6 transition-colors bg-white hover:bg-slate-100 px-4 py-2 rounded-full border border-slate-200 shadow-sm w-fit cursor-pointer"
           >
             <FontAwesomeIcon icon={faChevronLeft} className="w-3 h-3 transition-transform group-hover:-translate-x-1" />
-            Volver
+            {t("products.back", { defaultValue: 'Back' })}
           </button>
 
           <div>
             <div className="flex items-center gap-3 mb-2">
               <span className="text-xs font-bold uppercase text-indigo-700 bg-indigo-100 px-3 py-1 rounded-full shadow-sm">
-                Catálogo Global
+                {t("products.global_catalog", { defaultValue: 'Global Catalog' })}
               </span>
             </div>
             <h1 className="text-4xl md:text-5xl font-extrabold text-slate-800 drop-shadow-sm mb-4">
-              Base de Datos
+              {t("products.title", { defaultValue: 'Database' })}
             </h1>
-            <p className="text-slate-500 font-medium">Buscador global de productos de tu cuenta ({products.length})</p>
+            <p className="text-slate-500 font-medium">{t("products.subtitle", { defaultValue: 'Global product search for your account' })} ({products.length})</p>
           </div>
         </div>
 
@@ -131,7 +133,7 @@ export default function ProductsPage() {
           <div className="relative flex-1">
             <input
               type="text"
-              placeholder="Buscar por nombre..."
+              placeholder={t("products.search_placeholder", { defaultValue: 'Search by name...' })}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="w-full pl-12 pr-4 h-11 bg-white border-2 border-slate-100 rounded-xl text-slate-700 placeholder:text-slate-400 font-bold focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-400 transition-all shadow-sm"
@@ -161,8 +163,8 @@ export default function ProductsPage() {
                 {filteredProducts.length === 0 ? (
                   <div className="text-center py-20 bg-slate-50/50 rounded-2xl border-2 border-dashed border-slate-200">
                     <FontAwesomeIcon icon={faSearch} className="text-5xl mb-4 block text-slate-300 mx-auto" />
-                    <p className="text-slate-600 font-bold text-xl">No se encontraron productos</p>
-                    <p className="text-slate-400 text-sm mt-1">Prueba con otra búsqueda o categoría</p>
+                    <p className="text-slate-600 font-bold text-xl">{t("products.no_products", { defaultValue: 'No products found' })}</p>
+                    <p className="text-slate-400 text-sm mt-1">{t("products.no_products_desc", { defaultValue: 'Try another search or category' })}</p>
                   </div>
                 ) : (
                   <div className="divide-y divide-slate-100">
@@ -192,7 +194,7 @@ export default function ProductsPage() {
                             alert(`Añadir ${product.name} a una lista (funcionalidad extra)`)
                           }}
                         >
-                          Añadir a lista
+                          {t("products.add_to_list", { defaultValue: 'Add to list' })}
                         </button>
                       </div>
                     ))}

@@ -2,7 +2,7 @@
 
 import React, { useEffect } from 'react';
 import { useShoppingListItems } from '../hooks/useShoppingListItems';
-import { ShoppingListItemCard } from './ShoppingListItemCard';
+import ShoppingListItemCard from './ShoppingListItemCard';
 
 interface Props {
   listId: number;
@@ -34,7 +34,7 @@ export const ShoppingListItems: React.FC<Props> = ({ listId }) => {
   if (items.length === 0) {
     return (
        <div className="text-center p-8 text-gray-500 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
-        No hay productos en esta lista.
+        No products in this list.
       </div>
     );
   }

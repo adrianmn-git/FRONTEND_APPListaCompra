@@ -12,7 +12,10 @@ interface FinalPriceModalProps {
   listName: string
 }
 
+import { useI18n } from "@/i18n/hooks/useI18n"
+
 export default function FinalPriceModal({ isOpen, onClose, onConfirm, listName }: FinalPriceModalProps) {
+  const { t } = useI18n()
   const [price, setPrice] = useState<string>("")
   const [isLoading, setIsLoading] = useState(false)
   const [mounted, setMounted] = useState(false)
@@ -56,15 +59,18 @@ export default function FinalPriceModal({ isOpen, onClose, onConfirm, listName }
           </div>
 
           <h2 className="text-3xl font-black text-slate-800 mb-2 leading-tight">
-            ¡Compra Finalizada!
+            {t("modals.final_price_title", { defaultValue: 'Final Purchase Price' })}
           </h2>
           <p className="text-slate-500 font-medium mb-10 px-4">
-            ¿Cuál ha sido el precio final para <span className="text-indigo-600 font-bold">{listName}</span>?
+            {t("modals.final_price_desc", { name: listName, defaultValue: 'Enter the total price paid for "{{name}}" to complete the purchase.' })}
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-8">
             <div className="relative flex flex-col items-center">
               <div className="relative w-full">
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none">
+                   <FontAwesomeIcon icon={faEuroSign} className="text-xl" />
+                </div>
                 <input
                   type="number"
                   step="0.01"
@@ -73,11 +79,8 @@ export default function FinalPriceModal({ isOpen, onClose, onConfirm, listName }
                   onChange={(e) => setPrice(e.target.value)}
                   placeholder="0.00"
                   required
-                  className="w-full h-11 bg-white border-2 border-slate-100 rounded-xl px-4 text-slate-800 font-bold focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-400 transition-all text-sm appearance-none"
+                  className="w-full h-12 bg-white border-2 border-slate-100 rounded-xl pl-12 pr-4 text-slate-800 font-bold focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-400 transition-all text-lg appearance-none"
                 />
-                <div className="absolute left-8 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none">
-                   <FontAwesomeIcon icon={faEuroSign} className="text-2xl" />
-                </div>
               </div>
             </div>
 
@@ -87,7 +90,7 @@ export default function FinalPriceModal({ isOpen, onClose, onConfirm, listName }
                 onClick={onClose}
                 className="flex-1 px-6 py-5 bg-slate-100/50 hover:bg-slate-100 text-slate-500 font-bold rounded-[2rem] transition-all cursor-pointer hover:scale-105 active:scale-95"
               >
-                Omitir
+                {t("common.skip", { defaultValue: 'Skip' })}
               </button>
               <button
                 type="submit"
@@ -99,7 +102,7 @@ export default function FinalPriceModal({ isOpen, onClose, onConfirm, listName }
                 ) : (
                   <>
                     <FontAwesomeIcon icon={faCheckCircle} />
-                    Guardar Total
+                    {t("common.save", { defaultValue: 'Save' })}
                   </>
                 )}
               </button>

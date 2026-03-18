@@ -1,9 +1,10 @@
 "use client";
-
 import React, { createContext, useState } from 'react';
+
 import { ShoppingListItem, CreateShoppingListItemDTO } from '../entity/ShoppingListItem';
 import { ShoppingListItemRepository } from '../contexts/data/ShoppingListItemRepository';
 import { useNotification } from '@/notifications/hooks/useNotification';
+import { useI18n } from '@/i18n/hooks/useI18n';
 
 interface ShoppingListItemsContextType {
     items: ShoppingListItem[];
@@ -22,6 +23,7 @@ export const ShoppingListItemsProvider: React.FC<{ children: React.ReactNode }> 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const { success, error: notifyError } = useNotification();
+    const { t } = useI18n();
 
     const repository = ShoppingListItemRepository.live();
 
@@ -34,7 +36,7 @@ export const ShoppingListItemsProvider: React.FC<{ children: React.ReactNode }> 
         } catch (err: any) {
             const msg = err.message || 'Error al cargar los items';
             setError(msg);
-            notifyError('No se pudieron cargar los productos de la lista');
+            notifyError(t("notifications.error_load_items", { defaultValue: 'Error loading items' }));
         } finally {
             setLoading(false);
         }
@@ -44,11 +46,11 @@ export const ShoppingListItemsProvider: React.FC<{ children: React.ReactNode }> 
         try {
             const newItem = await repository.addItem(data);
             setItems([...items, newItem]);
-            success('Producto añadido a la lista');
+            success(t("notifications.item_added", { defaultValue: 'Item added successfully' }));
         } catch (err: any) {
             const msg = err.message || 'Error al añadir el item';
             setError(msg);
-            notifyError('Error al añadir el producto');
+            notifyError(t("notifications.error_add_item", { defaultValue: 'Error adding item' }));
             throw err;
         }
     };
@@ -63,12 +65,12 @@ export const ShoppingListItemsProvider: React.FC<{ children: React.ReactNode }> 
             if (updates.picked_up !== undefined) {
                 // Si solo cambió el estado de recogido, no mostramos toast para no saturar
             } else {
-                success('Producto actualizado');
+                success(t("notifications.item_updated", { defaultValue: 'Item updated' }));
             }
         } catch (err: any) {
             const msg = err.message || 'Error al actualizar el item';
             setError(msg);
-            notifyError('Error al actualizar el producto');
+            notifyError(t("notifications.error_update_item", { defaultValue: 'Error updating item' }));
             setItems(previousItems);
             throw err;
         }
@@ -79,11 +81,11 @@ export const ShoppingListItemsProvider: React.FC<{ children: React.ReactNode }> 
         setItems(items.filter(item => item.id !== itemId));
         try {
             await repository.deleteItem(itemId);
-            success('Producto eliminado de la lista');
+            success(t("notifications.item_removed", { defaultValue: 'Item removed' }));
         } catch (err: any) {
             const msg = err.message || 'Error al eliminar el item';
             setError(msg);
-            notifyError('Error al eliminar el producto');
+            notifyError(t("notifications.error_remove_item", { defaultValue: 'Error removing item' }));
             setItems(previousItems);
             throw err;
         }

@@ -72,6 +72,7 @@ const Toast: React.FC<ToastProps> = ({ type, message, onClose }) => {
           </div>
           <button
             onClick={onClose}
+            aria-label="Close notification"
             className={`flex-shrink-0 ml-4 h-6 w-6 rounded-lg flex items-center justify-center hover:bg-black/5 transition-colors cursor-pointer text-slate-400`}
           >
             <FontAwesomeIcon icon={faTimes} className="h-3 w-3" />

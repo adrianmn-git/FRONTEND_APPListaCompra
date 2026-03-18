@@ -1,9 +1,10 @@
 "use client";
-
 import React, { createContext, useState } from 'react';
+
 import { Product, CreateProductDTO } from '../entity/Product';
 import { ProductRepository } from './data/ProductRepository';
 import { useNotification } from '@/notifications/hooks/useNotification';
+import { useI18n } from '@/i18n/hooks/useI18n';
 
 interface ProductContextType {
     products: Product[];
@@ -20,6 +21,7 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const { success, error: notifyError } = useNotification();
+    const { t } = useI18n();
 
     const repository = ProductRepository.live();
 
@@ -31,6 +33,7 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
             setProducts(fetchedProducts);
         } catch (err: any) {
             setError(err.message || 'Error al cargar los productos');
+            notifyError(t("notifications.error_load_products", { defaultValue: 'Error loading products' }));
         } finally {
             setLoading(false);
         }
@@ -40,10 +43,10 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
         try {
             const newProduct = await repository.createProduct(data);
             setProducts([...products, newProduct]);
-            success(`Producto "${data.name}" añadido al catálogo`);
+            success(t("notifications.product_added_catalog", { name: data.name, defaultValue: `Product "{{name}}" added to catalog` }));
         } catch (err: any) {
             setError(err.message || 'Error al añadir el producto');
-            notifyError('Error al crear el producto');
+            notifyError(t("notifications.error_add_product", { defaultValue: 'Error adding product' }));
             throw err;
         }
     };

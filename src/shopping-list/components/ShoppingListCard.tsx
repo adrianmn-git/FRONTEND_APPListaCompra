@@ -5,15 +5,17 @@ import { ShoppingList } from "@/shopping-list/entity/ShoppingList"
 import { useListProgress } from "@/shopping-list-item/hooks/useListProgress"
 import { useShoppingList } from "@/shopping-list/hooks/useShoppingList"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faCheck, faTrash, faCalendarAlt, faStore, faArrowRight, faEuroSign } from "@fortawesome/free-solid-svg-icons"
+import { faCheck, faTrash, faCalendarAlt, faStore, faArrowRight, faEuroSign, faCartShopping, faBuilding, faTruck, faBasketShopping } from "@fortawesome/free-solid-svg-icons"
 import EditShoppingListForm from "./EditShoppingListForm"
 import ConfirmModal from "@/components/ui/ConfirmModal"
 import { useState } from "react"
+import { useI18n } from "@/i18n/hooks/useI18n"
 
-const SHOP_THEMES: Record<string, { label: string; gradient: string; text: string; light: string; shadow: string; hoverText: string; hoverBorder: string; accent: string }> = {
+const SHOP_THEMES: Record<string, { label: string; icon: any; gradient: string; text: string; light: string; shadow: string; hoverText: string; hoverBorder: string; accent: string }> = {
 // ... existing themes
   mercadona: {
     label: "Mercadona",
+    icon: faCartShopping,
     gradient: "from-emerald-500 to-green-600",
     text: "text-emerald-700",
     light: "bg-emerald-50 text-emerald-600",
@@ -24,6 +26,7 @@ const SHOP_THEMES: Record<string, { label: string; gradient: string; text: strin
   },
   alcampo: {
     label: "Alcampo",
+    icon: faStore,
     gradient: "from-rose-500 to-red-600",
     text: "text-rose-700",
     light: "bg-rose-50 text-rose-600",
@@ -34,6 +37,7 @@ const SHOP_THEMES: Record<string, { label: string; gradient: string; text: strin
   },
   sorli: {
     label: "Sorli",
+    icon: faBuilding,
     gradient: "from-blue-500 to-indigo-600",
     text: "text-blue-700",
     light: "bg-blue-50 text-blue-600",
@@ -44,6 +48,7 @@ const SHOP_THEMES: Record<string, { label: string; gradient: string; text: strin
   },
   esclat: {
     label: "Esclat",
+    icon: faStore,
     gradient: "from-red-500 to-orange-600",
     text: "text-red-700",
     light: "bg-red-50 text-red-600",
@@ -54,6 +59,7 @@ const SHOP_THEMES: Record<string, { label: string; gradient: string; text: strin
   },
   bonpreusa: {
     label: "Bonpreu",
+    icon: faStore,
     gradient: "from-amber-400 to-orange-500",
     text: "text-amber-700",
     light: "bg-amber-50 text-amber-600",
@@ -64,6 +70,7 @@ const SHOP_THEMES: Record<string, { label: string; gradient: string; text: strin
   },
   caprabo: {
     label: "Caprabo",
+    icon: faBasketShopping,
     gradient: "from-indigo-500 to-blue-700",
     text: "text-indigo-700",
     light: "bg-indigo-50 text-indigo-600",
@@ -74,6 +81,7 @@ const SHOP_THEMES: Record<string, { label: string; gradient: string; text: strin
   },
   carrefour: {
     label: "Carrefour",
+    icon: faTruck,
     gradient: "from-sky-500 to-blue-600",
     text: "text-sky-700",
     light: "bg-sky-50 text-sky-600",
@@ -86,6 +94,7 @@ const SHOP_THEMES: Record<string, { label: string; gradient: string; text: strin
 
 const DEFAULT_THEME = {
   label: "Supermercado",
+  icon: faStore,
   gradient: "from-slate-500 to-slate-600",
   text: "text-slate-700",
   light: "bg-slate-50 text-slate-600",
@@ -104,6 +113,7 @@ export default function ShoppingListCard({ list }: ShoppingListCardProps) {
   const { deleteList } = useShoppingList()
   const { total, picked, isLoading } = useListProgress(list.id)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  const { t } = useI18n()
 
   const theme = SHOP_THEMES[list.shop] || DEFAULT_THEME
 
@@ -133,10 +143,10 @@ export default function ShoppingListCard({ list }: ShoppingListCardProps) {
         isOpen={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}
         onConfirm={confirmDelete}
-        title="¿Eliminar lista?"
-        message={`Esta acción no se puede deshacer. Se eliminará la lista "${list.name}" y todos sus productos.`}
-        confirmText="Eliminar Lista"
-        cancelText="Cancelar"
+        title={t("list.delete_title", { defaultValue: 'Delete list?' })}
+        message={t("list.delete_message", { name: list.name, defaultValue: `This action cannot be undone. The list "{{name}}" and all its products will be deleted.` })}
+        confirmText={t("list.delete_permanent", { defaultValue: 'Delete permanently' })}
+        cancelText={t("common.cancel", { defaultValue: 'Cancel' })}
       />
       <div 
         onClick={() => router.push(`/lists/${list.id}`)} 
@@ -145,13 +155,13 @@ export default function ShoppingListCard({ list }: ShoppingListCardProps) {
       {/* SHOP STRIP (Full Width) */}
       <div className={`w-full bg-gradient-to-r ${theme.gradient} px-6 py-2 flex items-center justify-between`}>
         <div className="flex items-center gap-2 text-white/90">
-          <FontAwesomeIcon icon={faStore} className="text-[10px]" />
+          <FontAwesomeIcon icon={theme.icon} className="text-[10px]" />
           <span className="text-[10px] font-black uppercase tracking-widest">{theme.label}</span>
         </div>
         {list.completed && (
           <div className="flex items-center gap-1.5 text-white bg-white/20 backdrop-blur-md px-3 py-0.5 rounded-full border border-white/30 text-[9px] font-black uppercase">
             <FontAwesomeIcon icon={faCheck} />
-            Finalizada
+            {t("list.completed", { defaultValue: 'Completed' })}
           </div>
         )}
       </div>
@@ -190,6 +200,7 @@ export default function ShoppingListCard({ list }: ShoppingListCardProps) {
             />
             <button 
               onClick={handleDelete}
+              aria-label={t("list.delete_title", { defaultValue: 'Delete list?' })}
               className="w-9 h-9 flex-shrink-0 flex items-center justify-center rounded-xl text-slate-300 hover:text-red-500 hover:bg-red-50 transition-all duration-300 active:scale-90 border border-slate-50 hover:border-red-100"
             >
               <FontAwesomeIcon icon={faTrash} className="text-sm" />
@@ -201,7 +212,7 @@ export default function ShoppingListCard({ list }: ShoppingListCardProps) {
         <div className="bg-slate-50/50 p-4 rounded-2xl border border-slate-100/50 group-hover:bg-white transition-colors duration-500">
           <div className="flex items-center justify-between mb-3">
             <span className={`text-xs font-black ${isLoading ? 'animate-pulse text-slate-400' : 'text-slate-500'}`}>
-              {isLoading ? "Cargando..." : `${picked}/${total} Productos`}
+              {isLoading ? t("common.loading", { defaultValue: 'Loading...' }) : `${picked}/${total} ${t("list.items_count", { defaultValue: 'Products' })}`}
             </span>
             <div className="flex items-end gap-1">
               <span className={`text-lg font-black ${progress === 100 ? 'text-emerald-500' : theme.text.replace('text-', 'text-')}`}>
@@ -226,7 +237,7 @@ export default function ShoppingListCard({ list }: ShoppingListCardProps) {
 
         {/* COMPACT FOOTER */}
         <div className="flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-500 transform translate-y-2 group-hover:translate-y-0">
-          <span className="text-[9px] font-black uppercase text-slate-300 tracking-wider">Ver detalles de la lista</span>
+          <span className="text-[9px] font-black uppercase text-slate-300 tracking-wider">{t("list.view_details", { defaultValue: 'View list details' })}</span>
           <FontAwesomeIcon icon={faArrowRight} className={`${theme.accent} text-xs`} />
         </div>
       </div>
