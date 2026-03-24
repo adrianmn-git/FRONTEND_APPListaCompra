@@ -2,16 +2,11 @@
 
 import { useEffect, useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
-/*
-- [x] Integrate `CustomSelect` in Products Catalog (`app/products/page.tsx`)
-- [x] Add icons and colors to catalog categories
-- [x] Verify functionality and design consistency
-*/
 import { useProduct } from '@/product/hooks/useProduct'
-import { ProductCategory } from '@/product/entity/Product'
+import { Product } from '@/product/entity/Product'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { 
-  faChevronLeft, faSearch, faFilter, faChevronDown, faStar,
+  faChevronLeft, faSearch, faFilter, faChevronDown, faStar, faPlus,
   faAppleWhole, faCarrot, faDrumstickBite, faFish, faGlassWater, 
   faEgg, faBreadSlice, faBowlFood, faUtensils, faSeedling,
   faIcicles, faBoxArchive, faCookie, faCandyCane, faJar, faPepperHot,
@@ -19,193 +14,256 @@ import {
   faPaw, faBox
 } from '@fortawesome/free-solid-svg-icons'
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core'
-import CustomSelect, { CustomSelectOption } from '@/components/ui/CustomSelect'
 import { useI18n } from '@/i18n/hooks/useI18n'
+import AddProductToListModal from "@/product/components/AddProductToListModal"
+import ProductActions from "@/product/components/ProductActions"
 
-export default function ProductsPage() {
+export default function CatalogPage() {
   const router = useRouter()
   const { products, loadProducts, loading } = useProduct()
   const { t } = useI18n()
 
-  const [search, setSearch] = useState('')
-  const [selectedCategory, setSelectedCategory] = useState<string>('all')
+  const [searchQuery, setSearchQuery] = useState('')
+  // Multi-select state
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([])
+  const [addingProduct, setAddingProduct] = useState<Product | null>(null)
 
-  const CATEGORY_MAP: Record<string, { label: string; icon: IconDefinition; color: string }> = {
-    fruit: { label: t("categories.fruit", { defaultValue: 'Fruit' }), icon: faAppleWhole, color: 'bg-red-100 text-red-700 border-red-200' },
-    vegetables: { label: t("categories.fruit", { defaultValue: 'Fruit' }), icon: faCarrot, color: 'bg-emerald-100 text-emerald-700 border-emerald-200' },
-    meat: { label: t("categories.meat", { defaultValue: 'Meat' }), icon: faDrumstickBite, color: 'bg-orange-100 text-orange-700 border-orange-200' },
-    fish: { label: t("categories.meat", { defaultValue: 'Meat' }), icon: faFish, color: 'bg-blue-100 text-blue-700 border-blue-200' },
-    dairy: { label: t("categories.dairy", { defaultValue: 'Dairy' }), icon: faGlassWater, color: 'bg-indigo-100 text-indigo-700 border-indigo-200' },
-    eggs: { label: t("categories.dairy", { defaultValue: 'Dairy' }), icon: faEgg, color: 'bg-yellow-100 text-yellow-700 border-yellow-200' },
-    bread: { label: t("categories.bread", { defaultValue: 'Bread' }), icon: faBreadSlice, color: 'bg-amber-100 text-amber-700 border-amber-200' },
-    cereals: { label: t("categories.canned", { defaultValue: 'Canned & Grains' }), icon: faBowlFood, color: 'bg-stone-100 text-stone-700 border-stone-200' },
-    pasta_rice: { label: t("categories.canned", { defaultValue: 'Canned & Grains' }), icon: faUtensils, color: 'bg-yellow-50 text-yellow-800 border-yellow-100' },
-    legumes: { label: t("categories.canned", { defaultValue: 'Canned & Grains' }), icon: faSeedling, color: 'bg-brown-100 text-brown-700 border-brown-200' },
-    frozen: { label: t("categories.frozen", { defaultValue: 'Frozen' }), icon: faIcicles, color: 'bg-cyan-100 text-cyan-700 border-cyan-200' },
-    canned: { label: t("categories.canned", { defaultValue: 'Canned & Grains' }), icon: faBoxArchive, color: 'bg-zinc-100 text-zinc-700 border-zinc-200' },
-    snacks: { label: t("categories.snacks", { defaultValue: 'Snacks' }), icon: faCookie, color: 'bg-rose-100 text-rose-700 border-rose-200' },
-    sweets: { label: t("categories.sweets", { defaultValue: 'Sweets' }), icon: faCandyCane, color: 'bg-pink-100 text-pink-700 border-pink-200' },
-    sauces: { label: t("categories.sauces", { defaultValue: 'Sauces' }), icon: faJar, color: 'bg-red-50 text-red-800 border-red-100' },
-    spices: { label: t("categories.spices", { defaultValue: 'Spices' }), icon: faPepperHot, color: 'bg-orange-50 text-orange-800 border-orange-100' },
-    oil_vinegar: { label: t("categories.oil_vinegar", { defaultValue: 'Oil & Vinegar' }), icon: faOilCan, color: 'bg-yellow-100 text-yellow-900 border-yellow-200' },
-    drinks: { label: t("categories.drinks", { defaultValue: 'Drinks' }), icon: faGlassWhiskey, color: 'bg-purple-100 text-purple-700 border-purple-200' },
-    alcohol: { label: t("categories.drinks", { defaultValue: 'Drinks' }), icon: faWineGlass, color: 'bg-violet-100 text-violet-700 border-violet-200' },
-    cleaning: { label: t("categories.cleaning", { defaultValue: 'Cleaning' }), icon: faBroom, color: 'bg-blue-50 text-blue-700 border-blue-100' },
-    hygiene: { label: t("categories.hygiene", { defaultValue: 'Hygiene' }), icon: faSoap, color: 'bg-teal-50 text-teal-700 border-teal-100' },
-    baby: { label: t("categories.baby", { defaultValue: 'Baby' }), icon: faBaby, color: 'bg-sky-100 text-sky-700 border-sky-200' },
-    pets: { label: t("categories.pets", { defaultValue: 'Pets' }), icon: faPaw, color: 'bg-gray-200 text-gray-800 border-gray-300' },
-    other: { label: t("categories.other", { defaultValue: 'Other' }), icon: faBox, color: 'bg-gray-100 text-gray-700 border-gray-200' },
+  const CATEGORY_MAP: Record<string, { label: string; icon: IconDefinition; color: string; gradient: string }> = {
+    fruit: { label: t("categories.fruit", { defaultValue: 'Fruit' }), icon: faAppleWhole, color: 'text-red-500', gradient: 'from-orange-400 to-red-500' },
+    vegetables: { label: t("categories.fruit", { defaultValue: 'Vegetables' }), icon: faCarrot, color: 'text-emerald-500', gradient: 'from-emerald-400 to-teal-500' },
+    meat: { label: t("categories.meat", { defaultValue: 'Meat' }), icon: faDrumstickBite, color: 'text-rose-600', gradient: 'from-rose-500 to-red-600' },
+    fish: { label: t("categories.meat", { defaultValue: 'Fish' }), icon: faFish, color: 'text-blue-500', gradient: 'from-sky-400 to-blue-500' },
+    dairy: { label: t("categories.dairy", { defaultValue: 'Dairy' }), icon: faGlassWater, color: 'text-indigo-500', gradient: 'from-indigo-400 to-violet-500' },
+    eggs: { label: t("categories.dairy", { defaultValue: 'Eggs' }), icon: faEgg, color: 'text-amber-500', gradient: 'from-yellow-400 to-amber-500' },
+    bread: { label: t("categories.bread", { defaultValue: 'Bread' }), icon: faBreadSlice, color: 'text-amber-600', gradient: 'from-amber-500 to-orange-500' },
+    cereals: { label: t("categories.canned", { defaultValue: 'Canned & Grains' }), icon: faBowlFood, color: 'text-stone-500', gradient: 'from-stone-400 to-neutral-500' },
+    pasta_rice: { label: t("categories.canned", { defaultValue: 'Pasta & Rice' }), icon: faUtensils, color: 'text-amber-700', gradient: 'from-amber-600 to-orange-700' },
+    legumes: { label: t("categories.canned", { defaultValue: 'Legumes' }), icon: faSeedling, color: 'text-green-600', gradient: 'from-lime-400 to-green-600' },
+    frozen: { label: t("categories.frozen", { defaultValue: 'Frozen' }), icon: faIcicles, color: 'text-cyan-500', gradient: 'from-cyan-400 to-blue-500' },
+    canned: { label: t("categories.canned", { defaultValue: 'Canned' }), icon: faBoxArchive, color: 'text-slate-500', gradient: 'from-slate-400 to-zinc-500' },
+    snacks: { label: t("categories.snacks", { defaultValue: 'Snacks' }), icon: faCookie, color: 'text-orange-500', gradient: 'from-orange-400 to-rose-500' },
+    sweets: { label: t("categories.sweets", { defaultValue: 'Sweets' }), icon: faCandyCane, color: 'text-pink-500', gradient: 'from-pink-400 to-fuchsia-500' },
+    sauces: { label: t("categories.sauces", { defaultValue: 'Sauces' }), icon: faJar, color: 'text-red-700', gradient: 'from-red-500 to-red-700' },
+    spices: { label: t("categories.spices", { defaultValue: 'Spices' }), icon: faPepperHot, color: 'text-orange-600', gradient: 'from-orange-500 to-red-600' },
+    oil_vinegar: { label: t("categories.oil_vinegar", { defaultValue: 'Oil & Vinegar' }), icon: faOilCan, color: 'text-yellow-600', gradient: 'from-yellow-400 to-amber-500' },
+    drinks: { label: t("categories.drinks", { defaultValue: 'Drinks' }), icon: faGlassWhiskey, color: 'text-purple-500', gradient: 'from-violet-400 to-purple-600' },
+    alcohol: { label: t("categories.drinks", { defaultValue: 'Alcohol' }), icon: faWineGlass, color: 'text-purple-700', gradient: 'from-purple-500 to-fuchsia-700' },
+    cleaning: { label: t("categories.cleaning", { defaultValue: 'Cleaning' }), icon: faBroom, color: 'text-blue-400', gradient: 'from-sky-300 to-blue-500' },
+    hygiene: { label: t("categories.hygiene", { defaultValue: 'Hygiene' }), icon: faSoap, color: 'text-teal-500', gradient: 'from-teal-400 to-emerald-500' },
+    baby: { label: t("categories.baby", { defaultValue: 'Baby' }), icon: faBaby, color: 'text-sky-400', gradient: 'from-sky-300 to-cyan-500' },
+    pets: { label: t("categories.pets", { defaultValue: 'Pets' }), icon: faPaw, color: 'text-stone-600', gradient: 'from-stone-500 to-neutral-700' },
+    other: { label: t("categories.other", { defaultValue: 'Other' }), icon: faBox, color: 'text-slate-400', gradient: 'from-slate-400 to-slate-600' },
   }
-
-  const CATEGORIES_LIST: CustomSelectOption<string>[] = useMemo(() => [
-    { value: 'all', label: t("filters.all", { defaultValue: 'All' }), icon: faFilter, color: 'bg-slate-100 text-slate-500' },
-    ...Object.entries(CATEGORY_MAP).map(([value, { label, icon, color }]) => ({
-      value,
-      label,
-      icon,
-      color
-    })),
-  ], [t])
 
   useEffect(() => {
     loadProducts()
   }, [])
 
+  const toggleCategory = (cat: string) => {
+    setSelectedCategories(prev => 
+      prev.includes(cat) 
+        ? prev.filter(c => c !== cat)
+        : [...prev, cat]
+    )
+  }
+
+  const clearCategories = () => setSelectedCategories([])
+
   const filteredProducts = useMemo(() => {
     let result = [...products]
 
-    if (selectedCategory !== 'all') {
-      result = result.filter(p => p.category === selectedCategory)
+    if (selectedCategories.length > 0) {
+      result = result.filter(p => selectedCategories.includes(p.category))
     }
 
-    if (search.trim()) {
-      const q = search.toLowerCase()
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase()
       result = result.filter(p => p.name.toLowerCase().includes(q))
     }
 
     // Sort alphabetically
     return result.sort((a, b) => a.name.localeCompare(b.name))
-  }, [products, search, selectedCategory])
+  }, [products, searchQuery, selectedCategories])
 
-  const getCategoryIcon = (cat: string) => {
-    return CATEGORY_MAP[cat]?.icon || faBox
+  const getCategoryConfig = (cat: string) => {
+    return CATEGORY_MAP[cat] || { label: cat, icon: faBox, color: 'text-slate-400', gradient: 'from-slate-400 to-slate-600' }
   }
-  
-  const getCategoryLabel = (cat: string) => {
-    return CATEGORY_MAP[cat]?.label || cat
+
+  // Calculate dynamic backgrounds
+  const dynamicBg1 = selectedCategories.length > 0 ? getCategoryConfig(selectedCategories[0]).gradient : 'from-indigo-300/40 to-purple-400/20';
+  const dynamicBg2 = selectedCategories.length > 1 ? getCategoryConfig(selectedCategories[1]).gradient : (selectedCategories.length === 1 ? dynamicBg1 : 'from-emerald-300/30 to-sky-400/20');
+
+  // Format name safely
+  const formatName = (name: string) => {
+    if (!name) return "";
+    return name.charAt(0).toUpperCase() + name.slice(1);
   }
 
   return (
-    <main className="min-h-screen bg-transparent relative overflow-hidden">
-      {/* Background Decorative Elements */}
-      <div className="absolute top-0 left-0 w-full h-[500px] bg-gradient-to-br from-indigo-50/50 via-purple-50/30 to-slate-50 -z-10 blur-3xl rounded-full translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
+    <main className="min-h-screen bg-transparent relative overflow-x-hidden font-sans transition-colors duration-1000">
+      
+      {/* Universal Noise Background for Texture */}
+      <div className="absolute inset-0 bg-[url('/noise.png')] bg-[length:250px_250px] opacity-[0.06] pointer-events-none"></div>
 
-      <div className="max-w-4xl mx-auto px-6 py-12 lg:py-16">
+      {/* Dynamic Backgrounds (Discreet & Highly Blurred) */}
+      <div className={`absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-gradient-to-br ${dynamicBg1} blur-[160px] rounded-full pointer-events-none mix-blend-multiply z-0 transition-all duration-[2000ms] ease-in-out opacity-10`}></div>
+      <div className={`absolute top-[20%] right-[-10%] w-[40%] h-[60%] bg-gradient-to-bl ${dynamicBg2} blur-[160px] rounded-full pointer-events-none mix-blend-multiply z-0 transition-all duration-[2000ms] ease-in-out opacity-10`}></div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12 relative z-10">
         
-        {/* Superior navigation & Header Info */}
+        {/* Navigation & Titles */}
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 mb-8">
-          <button
-            onClick={() => router.push('/')}
-            className="group flex items-center gap-2 text-slate-500 hover:text-slate-800 text-sm font-semibold mb-6 transition-colors bg-white hover:bg-slate-100 px-4 py-2 rounded-full border border-slate-200 shadow-sm w-fit cursor-pointer"
-          >
-            <FontAwesomeIcon icon={faChevronLeft} className="w-3 h-3 transition-transform group-hover:-translate-x-1" />
-            {t("products.back", { defaultValue: 'Back' })}
-          </button>
-
-          <div>
-            <div className="flex items-center gap-3 mb-2">
-              <span className="text-xs font-bold uppercase text-indigo-700 bg-indigo-100 px-3 py-1 rounded-full shadow-sm">
-                {t("products.global_catalog", { defaultValue: 'Global Catalog' })}
-              </span>
+          <section className="relative overflow-hidden rounded-[3rem] bg-slate-900 border border-slate-800 text-white p-10 md:p-14 mb-10 shadow-2xl flex flex-col items-center text-center justify-center min-h-[320px] group z-20">
+          <div className="absolute inset-0 bg-[url('/noise.png')] opacity-30 mix-blend-overlay bg-[length:150px_150px]"></div>
+          <div className="absolute -top-32 -right-32 w-96 h-96 bg-gradient-to-br from-indigo-500/20 via-purple-500/10 to-transparent blur-3xl rounded-full scale-150 group-hover:scale-110 transition-transform duration-1000 z-0 pointer-events-none"></div>
+          
+          <div className="relative z-10 w-full flex flex-col items-center text-center justify-center p-4">
+            <div className="flex items-center gap-3 mb-6">
+               <span className="text-[10px] font-black uppercase tracking-widest text-indigo-400 bg-indigo-500/10 px-4 py-1.5 rounded-full border border-indigo-500/20 shadow-inner">
+                 Catálogo Global
+               </span>
             </div>
-            <h1 className="text-4xl md:text-5xl font-extrabold text-slate-800 drop-shadow-sm mb-4">
-              {t("products.title", { defaultValue: 'Database' })}
+            <h1 className="text-5xl md:text-7xl font-black tracking-tighter mb-4 leading-tight drop-shadow-md">
+              Base de Datos
             </h1>
-            <p className="text-slate-500 font-medium">{t("products.subtitle", { defaultValue: 'Global product search for your account' })} ({products.length})</p>
+            <p className="text-lg md:text-xl text-slate-300 font-medium max-w-2xl leading-relaxed flex items-center justify-center gap-4 mt-2">
+              Buscador global de productos de tu cuenta 
+              <span className="bg-slate-800 text-indigo-300 px-3 py-1 rounded-full text-xs font-black border border-slate-700 shadow-inner translate-y-[-1px]">
+                {products.length} Items
+              </span>
+            </p>
           </div>
+        </section>
         </div>
 
-        {/* Content Container (Glass) */}
-        <div className="bg-white/90 backdrop-blur-xl rounded-3xl p-6 md:p-10 shadow-2xl shadow-slate-300/50 border border-white animate-in fade-in slide-in-from-bottom-8 duration-1000">
+        {/* Universal Control Center */}
+        <section className="bg-white rounded-[3rem] p-6 shadow-xl shadow-slate-200/50 border border-slate-100 flex flex-col gap-6 relative z-30 animate-in fade-in slide-in-from-bottom-8 duration-1000 mb-8">
           
-          {/* Tiempos y Buscador */}
-          <div className="flex flex-col sm:flex-row gap-4 mb-8">
-          <div className="relative flex-1">
-            <input
-              type="text"
-              placeholder={t("products.search_placeholder", { defaultValue: 'Search by name...' })}
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-12 pr-4 h-11 bg-white border-2 border-slate-100 rounded-xl text-slate-700 placeholder:text-slate-400 font-bold focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-400 transition-all shadow-sm"
-            />
-            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
-              <FontAwesomeIcon icon={faSearch} className="w-4 h-4" />
+          {/* Top Control Row: Search & Add */}
+          <div className="flex flex-col lg:flex-row items-center justify-between gap-4 w-full">
+            <div className="relative w-full">
+              <FontAwesomeIcon icon={faSearch} className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400 text-lg" />
+              <input 
+                type="text" 
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Buscar producto por nombre..."
+                className="w-full bg-slate-50 border border-slate-200 text-slate-800 placeholder:text-slate-400/80 px-14 py-4 rounded-3xl focus:outline-none focus:ring-2 focus:ring-indigo-400 transition-all font-black shadow-inner"
+              />
+              {searchQuery && (
+                <button onClick={() => setSearchQuery('')} className="absolute right-6 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 font-black text-sm transition-colors cursor-pointer">
+                  ✕
+                </button>
+              )}
+            </div>
+            
+            <div className="shrink-0 w-full lg:w-auto">
+               <ProductActions variant="horizontal" />
             </div>
           </div>
-          
-          <div className="relative shrink-0 sm:w-64">
-            <CustomSelect
-              value={selectedCategory}
-              options={CATEGORIES_LIST}
-              onChange={(val) => setSelectedCategory(val)}
-            />
-          </div>
-        </div>
 
-          {/* List of Products */}
+          {/* Bottom Row: Categories */}
+          <div className="border-t border-slate-100 pt-6">
+            <div className="flex items-center justify-between px-2 mb-4">
+               <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400">Filtrar por Categoría Multiselección</h3>
+               {selectedCategories.length > 0 && (
+                  <button onClick={clearCategories} className="text-[10px] font-black uppercase tracking-widest text-indigo-500 hover:text-indigo-700 transition-colors cursor-pointer bg-indigo-50 px-2 py-1 rounded-md mb-1">
+                    Limpiar ({selectedCategories.length})
+                  </button>
+               )}
+            </div>
+            
+            <div className="flex flex-wrap items-center gap-2.5 px-1 pb-1">
+            {Object.entries(CATEGORY_MAP).map(([catId, config]) => {
+              const isSelected = selectedCategories.includes(catId);
+              return (
+                <button
+                  key={catId}
+                  onClick={() => toggleCategory(catId)}
+                  className={`shrink-0 flex items-center gap-2 px-3 py-2 rounded-xl border-2 transition-all duration-300 font-bold text-xs cursor-pointer ${
+                    isSelected 
+                      ? `border-transparent bg-gradient-to-r ${config.gradient} text-white shadow-md shadow-slate-200 hover:shadow-lg transform -translate-y-[1px]`
+                      : `border-slate-100 bg-slate-50 text-slate-600 hover:border-slate-200 hover:bg-white hover:shadow-sm`
+                  }`}
+                >
+                  <FontAwesomeIcon icon={config.icon} className={isSelected ? 'text-white' : config.color} />
+                  {config.label}
+                </button>
+              )
+            })}
+            </div>
+          </div>
+        </section>
+
+        {/* Products Grid (Bento Style) */}
+        <div className="mt-8 relative z-20">
           {loading ? (
-            <div className="flex justify-center py-16">
-              <div className="animate-spin rounded-full h-10 w-10 border-b-4 border-indigo-600" />
-            </div>
+             <div className="flex justify-center py-32">
+               <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-indigo-600" />
+             </div>
+          ) : filteredProducts.length === 0 ? (
+             <div className="flex flex-col items-center justify-center p-20 text-center bg-white rounded-[3rem] shadow-xl shadow-slate-200/50 border border-slate-100 animate-in fade-in zoom-in duration-500">
+                <div className="w-24 h-24 bg-slate-50 rounded-full flex items-center justify-center mb-6">
+                  <FontAwesomeIcon icon={faSearch} className="text-4xl text-slate-300" />
+                </div>
+                <h3 className="text-2xl font-black text-slate-800 mb-2">{t("products.no_products", { defaultValue: 'No products found' })}</h3>
+                <p className="text-slate-500 font-medium">Try adjusting your filters or search query.</p>
+             </div>
           ) : (
-            <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white p-6 md:p-8">
-              <div className="flex flex-col">
-                {filteredProducts.length === 0 ? (
-                  <div className="text-center py-20 bg-slate-50/50 rounded-2xl border-2 border-dashed border-slate-200">
-                    <FontAwesomeIcon icon={faSearch} className="text-5xl mb-4 block text-slate-300 mx-auto" />
-                    <p className="text-slate-600 font-bold text-xl">{t("products.no_products", { defaultValue: 'No products found' })}</p>
-                    <p className="text-slate-400 text-sm mt-1">{t("products.no_products_desc", { defaultValue: 'Try another search or category' })}</p>
-                  </div>
-                ) : (
-                  <div className="divide-y divide-slate-100">
-                    {filteredProducts.map((product) => (
-                      <div 
-                        key={product.id}
-                        className="group flex items-center justify-between py-4 px-2 hover:bg-slate-50/50 transition-colors cursor-default rounded-xl"
-                      >
-                        <div className="flex items-center gap-4">
-                          <div className={`flex items-center justify-center w-12 h-12 rounded-2xl shadow-sm border text-xl group-hover:scale-110 transition-transform ${CATEGORY_MAP[product.category]?.color || 'bg-white border-slate-100 text-slate-400'}`}>
-                            <FontAwesomeIcon icon={getCategoryIcon(product.category)} />
-                          </div>
-                          <div>
-                            <h3 className="font-bold text-slate-800 capitalize leading-tight group-hover:text-indigo-600 transition-colors">
-                              {product.name}
-                            </h3>
-                            <p className="text-[11px] uppercase font-extrabold text-slate-400 mt-0.5">
-                              {getCategoryLabel(product.category)}
-                            </p>
+             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 animate-in fade-in slide-in-from-bottom-12 duration-1000">
+               {filteredProducts.map(product => {
+                 const config = getCategoryConfig(product.category);
+                 
+                 return (
+                   <div 
+                     key={product.id}
+                     className="group bg-white rounded-[2rem] p-6 shadow-xl shadow-slate-200/40 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] ring-1 ring-slate-900/5 hover:ring-slate-900/10 transition-all duration-500 hover:-translate-y-1.5 flex flex-col justify-between gap-6 cursor-default relative overflow-hidden"
+                   >
+                     {/* Ambient Card Background Glow */}
+                     <div className={`absolute -bottom-16 -right-16 w-40 h-40 bg-gradient-to-br ${config.gradient} opacity-[0.05] blur-[40px] rounded-full group-hover:scale-150 group-hover:opacity-[0.1] transition-all duration-1000 ease-out pointer-events-none z-0`}></div>
+                     
+                     <div className="relative z-10 flex items-start justify-between gap-4">
+                        {/* Premium Apple-esque Icon Badge */}
+                        <div className="relative group/badge">
+                          <div className={`absolute inset-0 bg-gradient-to-br ${config.gradient} rounded-2xl blur-md opacity-20 group-hover/badge:opacity-40 transition-opacity duration-500`}></div>
+                          <div className={`relative w-14 h-14 bg-gradient-to-br ${config.gradient} p-[1px] rounded-2xl shadow-sm transform group-hover:rotate-[8deg] group-hover:scale-110 transition-transform duration-500 ease-out-back flex items-center justify-center`}>
+                             <div className="w-full h-full bg-white/95 backdrop-blur-xl rounded-[0.9rem] flex items-center justify-center overflow-hidden">
+                               <FontAwesomeIcon icon={config.icon} className={`text-xl ${config.color}`} />
+                             </div>
                           </div>
                         </div>
-                        
-                        <button 
-                          className="opacity-0 group-hover:opacity-100 px-3 py-1.5 bg-indigo-50 text-indigo-600 text-[11px] font-bold uppercase rounded-lg hover:bg-indigo-600 hover:text-white transition-all transform translate-x-2 group-hover:translate-x-0 cursor-pointer"
-                          onClick={() => {
-                            // Aquí se podría añadir a una lista por defecto o abrir selector
-                            alert(`Añadir ${product.name} a una lista (funcionalidad extra)`)
-                          }}
-                        >
-                          {t("products.add_to_list", { defaultValue: 'Add to list' })}
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
 
+                        {/* Add Button */}
+                        <button 
+                          onClick={() => setAddingProduct(product)}
+                          className="shrink-0 w-10 h-10 flex items-center justify-center bg-slate-50 hover:bg-indigo-600 text-slate-400 hover:text-white rounded-full transition-colors duration-300 shadow-sm active:scale-95 cursor-pointer"
+                          aria-label={t("products.add_to_list", { defaultValue: 'Add to List' })}
+                        >
+                          <FontAwesomeIcon icon={faPlus} className="text-sm" />
+                        </button>
+                     </div>
+
+                     <div className="relative z-10 flex flex-col gap-1">
+                        <h3 className="text-xl font-black text-slate-800 tracking-[-0.02em] leading-tight group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-br group-hover:from-slate-800 group-hover:to-indigo-600 transition-all duration-500 line-clamp-2">
+                          {formatName(product.name)}
+                        </h3>
+                        <p className="text-[10px] uppercase font-black text-slate-400 tracking-widest mt-1">
+                          {config.label}
+                        </p>
+                     </div>
+                   </div>
+                 )
+               })}
+             </div>
+          )}
         </div>
       </div>
+
+      {/* Global Add Product Modal Portal */}
+      <AddProductToListModal 
+        product={addingProduct} 
+        onClose={() => setAddingProduct(null)} 
+      />
     </main>
   )
 }

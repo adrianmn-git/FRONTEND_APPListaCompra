@@ -1,36 +1,97 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🛒 ListaCompra - Shopping List App
 
-## Getting Started
+ListaCompra is a modern, premium web application built to manage your shopping lists efficiently. Designed with a stunning UI and a robust **Feature-Based Clean Architecture**, it provides a seamless user experience across devices with full support for internationalization and detailed purchase statistics.
 
-First, run the development server:
+## ✨ Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- **🛍️ Smart Shopping Lists**: Create, manage, and track your shopping lists. Add products, update quantities, set units, and mark items as collected or completed.
+- **📊 Advanced Statistics Dashboards**: Visualize your purchasing habits with detailed charts. Track average spending per supermarket, identify the cheapest options, and analyze product distribution by category with color-coded data blocks.
+- **🔒 Secure Authentication**: Built-in user registration and login powered by JWT and bcrypt for secure access to your personal lists.
+- **🌍 Multi-language Support (i18n)**: Fully translated interfaces available in **English, Spanish, and Catalan**, complete with standardized high-quality flag icons for seamless switching.
+- **🧾 Receipt Scanner Integration**: Modern interface designed for scanning, uploading, and processing shopping receipts automatically.
+- **🎨 Premium UI/UX**: Designed with modern web aesthetics—featuring smooth animations, glassmorphism, responsive bento grids, custom typographic hierarchy, and authentic supermarket logos.
+
+## 🏗️ Architecture
+
+The frontend follows a strict **Feature-Based Clean Architecture** implemented in Next.js, ensuring high scalability, maintainability, and clear separation of concerns down the domain line.
+
+```text
+Component (UI)
+   ↓
+Hook (UI Logic)
+   ↓
+Context (Global State)
+   ↓
+Repository (Data Access Layer)
+   ↓
+Datasource (API Handling & HTTP)
+   ↓
+Django REST API (Backend)
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Each feature module structurally implements:
+- `components/` → Pure React UI components.
+- `hooks/` → UI specific logic & domain isolation.
+- `contexts/` → Global state management for feature domains.
+- `data/sources/` → Direct HTTP calls via standard Fetch/Axios interacting with APIs.
+- `data/repository/` → The abstraction layer parsing data to core entities.
+- `entity/` → Core data models, interfaces, and TypeScript types.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🛠️ Technology Stack
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Frontend
+- **Framework**: [Next.js](https://nextjs.org/) (App Router)
+- **Library**: React 18+
+- **Language**: TypeScript
+- **Styling**: Custom CSS and TailwindCSS 
 
-## Learn More
+### Backend
+- **Framework**: Python / Django
+- **API**: Django REST Framework
+- **Database**: SQLite (Development)
+- **Auth**: JWT & bcrypt
 
-To learn more about Next.js, take a look at the following resources:
+## 🚀 Getting Started
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Prerequisites
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+You will need Node.js installed to run the frontend locally. Ensure your backend Django server is active and exposed on `http://localhost:8000` before running the client.
 
-## Deploy on Vercel
+### Installation
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. Clone the repository and navigate to the root directory:
+   ```bash
+   git clone <repository-url>
+   cd shopping-list-frontend
+   ```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+   *or using yarn/pnpm equivalent.*
+
+3. Run the development server:
+   ```bash
+   npm run dev
+   ```
+
+4. Open [http://localhost:3000](http://localhost:3000) with your browser to experience the application.
+
+## 📡 Core Application Endpoints (Reference)
+
+The frontend communicates exclusively via structured DTOs with the Django REST API standard endpoints:
+
+- **Shopping Lists**: `GET /lists`, `POST /lists/create`, `PATCH /lists/{id}/complete`, `GET /lists/{id}/items`
+- **Products**: `GET /products`, `POST /products/create`
+- **List Items**: `POST /items/add`, `PATCH /items/{id}/update`, `DELETE /items/{id}/delete`
+
+## 👨‍💻 Development Guidelines
+
+- **Architecture Compliance**: Do not bypass layers. UI components must remain unaware of the API logic; components rely on Contexts and Hooks.
+- **Language Translations**: Spanish and Catalan must be supported for all new UI text elements. English is the default layer.
+- **Typing Integrity**: Use purely strict typing for props, entities, and data models.
+
+---
+
+*A robust implementation showcasing frontend design architecture excellence.*

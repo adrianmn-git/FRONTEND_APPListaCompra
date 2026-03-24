@@ -11,6 +11,7 @@ export interface CustomSelectOption<T> {
   value: T
   label: string
   icon?: IconDefinition
+  logoUrl?: string
   color?: string
 }
 
@@ -111,11 +112,13 @@ export default function CustomSelect<T extends string | number>({
         className={`w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-4 h-11 flex items-center justify-between text-slate-800 font-bold transition-all hover:border-slate-200 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-400 group cursor-pointer ${isOpen ? 'border-indigo-400 ring-4 ring-indigo-500/10' : ''}`}
       >
         <div className="flex items-center gap-3">
-          {selectedOption?.icon && (
+          {selectedOption?.logoUrl ? (
+            <img src={selectedOption.logoUrl} alt={selectedOption.label} className="w-7 h-7 rounded-full shadow-sm shadow-black/20 object-cover" />
+          ) : selectedOption?.icon ? (
             <div className={`w-7 h-7 rounded-lg flex items-center justify-center text-sm transition-transform group-hover:scale-105 ${selectedOption.color || 'bg-indigo-50 text-indigo-500'}`}>
               <FontAwesomeIcon icon={selectedOption.icon} />
             </div>
-          )}
+          ) : null}
           <span className={`text-[11px] font-black transition-colors ${selectedOption ? "text-slate-800" : "text-slate-400"}`}>
             {selectedOption ? selectedOption.label : placeholder}
           </span>
@@ -179,11 +182,13 @@ export default function CustomSelect<T extends string | number>({
                   }`}
                 >
                   <div className="flex items-center gap-3">
-                    {option.icon && (
+                    {option.logoUrl ? (
+                      <img src={option.logoUrl} alt={option.label} className="w-7 h-7 rounded-full shadow-sm shadow-black/10 object-cover" />
+                    ) : option.icon ? (
                       <div className={`w-7 h-7 rounded-lg flex items-center justify-center text-sm transition-transform group-hover:scale-110 ${option.color || 'bg-indigo-50 text-indigo-500'}`}>
                         <FontAwesomeIcon icon={option.icon} />
                       </div>
-                    )}
+                    ) : null}
                     <span className={`text-xs font-black tracking-tight ${value === option.value ? 'text-indigo-800' : 'text-slate-700'}`}>
                       {option.label}
                     </span>

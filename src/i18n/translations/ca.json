@@ -21,7 +21,9 @@
   },
   "nav": {
     "home": "Inici",
-    "catalog": "Catàleg"
+    "catalog": "Catàleg",
+    "scan": "Escanejar",
+    "stats": "Estadístiques"
   },
   "footer": {
     "tagline": "Transformant la gestió de la teva compra diària en una experiència senzilla, ràpida i elegant.",
@@ -136,7 +138,7 @@
     "title": "Base de Dades",
     "subtitle": "Cercador global de productes del teu compte",
     "global_catalog": "Catàleg Global",
-    "back": "Tornar",
+    "total_count": "{{count}} productes",
     "search_placeholder": "Cercar per nom...",
     "no_products": "No s'han trobat productes",
     "no_products_desc": "Prova amb una altra cerca o categoria",
@@ -213,5 +215,49 @@
     "success": {
       "profile_updated": "Perfil actualitzat correctament"
     }
+  },
+  "stats": {
+    "global_stats": "Anàlisi i Dades",
+    "title": "Estadístiques Globals",
+    "subtitle": "Analitza els teus hàbits de compra i la teva base de dades.",
+    "overview_title": "Resum General",
+    "units": "Unitats",
+    "total_lists": "Llistes Totals",
+    "completed_lists": "Finalitzades",
+    "total_spent": "Total Gastat",
+    "completion_rate": "Ràtio d'Èxit",
+    "amount_shops": "Botigues Utilitzades",
+    "total_products": "Productes Totals",
+    "lists_by_shop": "Llistes de compra per Supermercat",
+    "avg_expense_by_shop": "Despesa Mitjana per Supermercat (€)",
+    "products_by_category": "Productes per Categoria",
+    "cheapest_shop_label": "Supermercat més barat",
+    "cheapest_shop_info": "Basat en el tiquet mitjà de les teves compres històriques finalitzades.",
+    "avg_expense_label": "Despesa Mitjana",
+    "total_spent_desc": "Suma de totes les compres finalitzades",
+    "completed_lists_label": "llistes finalitzades",
+    "products_in_catalog": "En el teu catàleg global",
+    "empty_data": "Encara no hi ha prou dades."
+  },
+  "scan": {
+    "title": "Escanejar Llista de Compra",
+    "subtitle": "Puja una foto de la teva llista de la compra escrita a mà i la digitalitzarem automàticament.",
+    "format_title": "Format esperat",
+    "format_complete": "Llista completa",
+    "format_continuation": "Pàgina de continuació",
+    "drop_title": "Arrossega les teves imatges aquí",
+    "drop_subtitle": "o fes clic per buscar arxius",
+    "selected_images": "Imatges seleccionades",
+    "scan_button": "Escanejar Llista de Compra",
+    "scanning": "Analitzant imatges...",
+    "success_title": "Llista creada amb èxit!",
+    "success_subtitle": "{{count}} productes afegits a la teva llista",
+    "success_message": "Llista \"{{name}}\" creada amb {{count}} productes",
+    "error_title": "Error en l'escaneig",
+    "error_scan": "Error en escanejar les imatges",
+    "try_again": "Tornar a intentar",
+    "products_detected": "Productes detectats",
+    "view_list": "Veure llista",
+    "scan_another": "Escanejar altra llista"
   }
 }

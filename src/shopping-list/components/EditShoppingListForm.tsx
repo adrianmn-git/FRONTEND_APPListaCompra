@@ -5,9 +5,10 @@ import { createPortal } from "react-dom"
 import { useShoppingList } from "@/shopping-list/hooks/useShoppingList"
 import { ShoppingList } from "@/shopping-list/entity/ShoppingList"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faPlus, faXmark, faChevronDown, faPenToSquare, faBasketShopping, faShop, faTruck, faCartShopping, faStore, faBuilding } from "@fortawesome/free-solid-svg-icons"
+import { faPlus, faXmark, faPenToSquare } from "@fortawesome/free-solid-svg-icons"
 import CustomSelect, { CustomSelectOption } from "@/components/ui/CustomSelect"
 import { useI18n } from "@/i18n/hooks/useI18n"
+import { SHOP_CONFIG } from "../utils/shopConfig"
 
 type ShopType = ShoppingList['shop']
 
@@ -27,15 +28,13 @@ export default function EditShoppingListForm({ list, className }: EditShoppingLi
   const [isLoading, setIsLoading] = useState(false)
   const [mounted, setMounted] = useState(false)
 
-  const SHOPS: CustomSelectOption<ShopType>[] = [
-    { value: "mercadona", label: "Mercadona", icon: faCartShopping, color: "bg-emerald-50 text-emerald-600 border-emerald-100" },
-    { value: "alcampo", label: "Alcampo", icon: faShop, color: "bg-red-50 text-red-600 border-red-100" },
-    { value: "sorli", label: "Sorli", icon: faBuilding, color: "bg-blue-50 text-blue-600 border-blue-100" },
-    { value: "esclat", label: "Esclat", icon: faStore, color: "bg-orange-50 text-orange-600 border-orange-100" },
-    { value: "bonpreusa", label: "Bonpreu", icon: faStore, color: "bg-amber-50 text-amber-600 border-amber-100" },
-    { value: "caprabo", label: "Caprabo", icon: faBasketShopping, color: "bg-indigo-50 text-indigo-600 border-indigo-100" },
-    { value: "carrefour", label: "Carrefour", icon: faTruck, color: "bg-sky-50 text-sky-600 border-sky-100" },
-  ]
+  const SHOPS: CustomSelectOption<ShopType>[] = Object.entries(SHOP_CONFIG).map(([key, config]) => ({
+    value: key as ShopType,
+    label: config.label,
+    icon: config.icon,
+    logoUrl: config.logoUrl,
+    color: `${config.bg} ${config.text} ${config.border}`
+  }))
 
   useEffect(() => {
     setMounted(true)

@@ -21,7 +21,9 @@
   },
   "nav": {
     "home": "Home",
-    "catalog": "Catalog"
+    "catalog": "Catalog",
+    "scan": "Scan",
+    "stats": "Stats"
   },
   "footer": {
     "tagline": "Transforming your daily shopping management into a simple, fast, and elegant experience.",
@@ -136,7 +138,7 @@
     "title": "Database",
     "subtitle": "Global product search for your account",
     "global_catalog": "Global Catalog",
-    "back": "Back",
+    "total_count": "{{count}} products",
     "search_placeholder": "Search by name...",
     "no_products": "No products found",
     "no_products_desc": "Try another search or category",
@@ -213,5 +215,49 @@
     "success": {
       "profile_updated": "Profile updated successfully"
     }
+  },
+  "stats": {
+    "global_stats": "Insights & Analytics",
+    "title": "Global Statistics",
+    "subtitle": "Analyze your purchasing habits and database.",
+    "overview_title": "General Overview",
+    "units": "Units",
+    "total_lists": "Total Lists",
+    "completed_lists": "Completed",
+    "total_spent": "Total Spent",
+    "completion_rate": "Completion Rate",
+    "amount_shops": "Shops Used",
+    "total_products": "Total Products",
+    "lists_by_shop": "Shopping lists by Supermarket",
+    "avg_expense_by_shop": "Average expense by Supermarket (€)",
+    "products_by_category": "Products by Category",
+    "cheapest_shop_label": "Cheapest Supermarket",
+    "cheapest_shop_info": "Based on the average ticket of your completed historical purchases.",
+    "avg_expense_label": "Avg Expense",
+    "total_spent_desc": "Sum of all completed purchases",
+    "completed_lists_label": "completed lists",
+    "products_in_catalog": "In your global catalog",
+    "empty_data": "Not enough data available yet."
+  },
+  "scan": {
+    "title": "Scan Shopping List",
+    "subtitle": "Upload a photo of your handwritten shopping list and we'll digitize it automatically.",
+    "format_title": "Expected format",
+    "format_complete": "Complete list",
+    "format_continuation": "Continuation page",
+    "drop_title": "Drop your images here",
+    "drop_subtitle": "or click to browse files",
+    "selected_images": "Selected images",
+    "scan_button": "Scan Shopping List",
+    "scanning": "Analyzing images...",
+    "success_title": "List created successfully!",
+    "success_subtitle": "{{count}} products added to your list",
+    "success_message": "List \"{{name}}\" created with {{count}} products",
+    "error_title": "Scan failed",
+    "error_scan": "Error scanning images",
+    "try_again": "Try again",
+    "products_detected": "Products detected",
+    "view_list": "View list",
+    "scan_another": "Scan another list"
   }
 }

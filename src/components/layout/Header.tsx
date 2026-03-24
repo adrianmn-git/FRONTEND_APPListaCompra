@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faBasketShopping, faHouse, faListUl } from "@fortawesome/free-solid-svg-icons"
+import { faBasketShopping, faHouse, faListUl, faChartPie, faCameraRetro } from "@fortawesome/free-solid-svg-icons"
 import { useI18n } from "@/i18n/hooks/useI18n"
 import LanguageSelector from "@/i18n/components/LanguageSelector"
 import { UserMenu } from "@/auth/components/UserMenu"
@@ -15,6 +15,8 @@ export default function Header() {
   const navItems = [
     { name: t("nav.home", { defaultValue: 'Home' }), href: "/", icon: faHouse },
     { name: t("nav.catalog", { defaultValue: 'Catalog' }), href: "/products", icon: faListUl },
+    { name: t("nav.scan", { defaultValue: 'Scan' }), href: "/scan", icon: faCameraRetro },
+    { name: t("nav.stats", { defaultValue: 'Stats' }), href: "/stats", icon: faChartPie },
   ]
 
   return (
@@ -31,7 +33,7 @@ export default function Header() {
         </Link>
 
         {/* Navigation Links */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-1.5 lg:gap-2">
           {navItems.map((item) => {
             const isActive = pathname === item.href
             return (
@@ -57,7 +59,7 @@ export default function Header() {
           <UserMenu />
           <div className="hidden lg:block text-right">
             <span className="text-[10px] font-black uppercase text-slate-300 tracking-wider">
-              {t("common.version", { defaultValue: 'Version' })} 0.2
+              {t("common.version", { defaultValue: 'Version' })} 0.5
             </span>
           </div>
         </div>

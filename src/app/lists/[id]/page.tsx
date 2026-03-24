@@ -15,6 +15,7 @@ import EditShoppingListForm from '@/shopping-list/components/EditShoppingListFor
 import FinalPriceModal from '@/shopping-list/components/FinalPriceModal'
 import ConfirmModal from '@/components/ui/ConfirmModal'
 import { useI18n } from '@/i18n/hooks/useI18n'
+import { SHOP_CONFIG } from '@/shopping-list/utils/shopConfig'
 
 export default function ShoppingListDetailsPage() {
   const { id } = useParams()
@@ -133,7 +134,13 @@ export default function ShoppingListDetailsPage() {
 
         {/* Supermarket Top Band */}
         <div className={`w-full rounded-[2rem] mb-6 px-6 py-3.5 flex items-center justify-center gap-3 shadow-lg shadow-${currentShopTheme.bg.split('-')[1]}-500/30 transition-all ${currentShopTheme.bg} outline outline-4 outline-white`}>
-          <FontAwesomeIcon icon={currentShopTheme.icon} className={`text-xl ${currentShopTheme.text}`} />
+          {SHOP_CONFIG[list.shop as keyof typeof SHOP_CONFIG]?.logoUrl ? (
+            <div className="w-10 h-10 bg-white p-0.5 rounded-2xl shadow-sm flex items-center justify-center -my-1 shrink-0 overflow-hidden transform rotate-2 hover:rotate-0 transition-transform">
+              <img src={SHOP_CONFIG[list.shop as keyof typeof SHOP_CONFIG].logoUrl} alt={currentShopTheme.label} className="w-full h-full object-cover rounded-[14px]" />
+            </div>
+          ) : (
+            <FontAwesomeIcon icon={currentShopTheme.icon} className={`text-xl ${currentShopTheme.text}`} />
+          )}
           <span className={`font-black uppercase tracking-widest text-sm ${currentShopTheme.text}`}>{currentShopTheme.label}</span>
         </div>
 

@@ -3,13 +3,18 @@
 import React, { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faPlus, faXmark, faChevronDown, faAppleWhole, faDrumstickBite, faGlassWater, faBoxArchive, faIcicles, faGlassWhiskey, faBroom, faSoap, faBox } from "@fortawesome/free-solid-svg-icons"
+import { faPlus, faXmark } from "@fortawesome/free-solid-svg-icons"
 import { useProduct } from '../hooks/useProduct'
 import { ProductCategory } from '../entity/Product'
 import CustomSelect, { CustomSelectOption } from "@/components/ui/CustomSelect"
 import { useI18n } from "@/i18n/hooks/useI18n"
+import { CATEGORY_CONFIG } from "../utils/categoryConfig"
 
-export default function ProductActions() {
+interface Props {
+  variant?: 'vertical' | 'horizontal'
+}
+
+export default function ProductActions({ variant = 'vertical' }: Props) {
   const { addProduct } = useProduct()
   const { t } = useI18n()
 
@@ -20,17 +25,12 @@ export default function ProductActions() {
   const [errorLocal, setErrorLocal] = useState<string | null>(null)
   const [mounted, setMounted] = useState(false)
 
-  const CATEGORIES: CustomSelectOption<ProductCategory>[] = [
-    { value: 'fruit', label: t("categories.fruit", { defaultValue: 'Fruit' }), icon: faAppleWhole, color: 'bg-emerald-50 text-emerald-600 border-emerald-100' },
-    { value: 'meat', label: t("categories.meat", { defaultValue: 'Meat' }), icon: faDrumstickBite, color: 'bg-red-50 text-red-600 border-red-100' },
-    { value: 'dairy', label: t("categories.dairy", { defaultValue: 'Dairy' }), icon: faGlassWater, color: 'bg-indigo-50 text-indigo-600 border-indigo-100' },
-    { value: 'canned', label: t("categories.canned", { defaultValue: 'Canned' }), icon: faBoxArchive, color: 'bg-amber-50 text-amber-600 border-amber-100' },
-    { value: 'frozen', label: t("categories.frozen", { defaultValue: 'Frozen' }), icon: faIcicles, color: 'bg-cyan-50 text-cyan-600 border-cyan-100' },
-    { value: 'drinks', label: t("categories.drinks", { defaultValue: 'Drinks' }), icon: faGlassWhiskey, color: 'bg-purple-50 text-purple-600 border-purple-100' },
-    { value: 'cleaning', label: t("categories.cleaning", { defaultValue: 'Cleaning' }), icon: faBroom, color: 'bg-blue-50 text-blue-600 border-blue-100' },
-    { value: 'hygiene', label: t("categories.hygiene", { defaultValue: 'Hygiene' }), icon: faSoap, color: 'bg-teal-50 text-teal-700 border-teal-100' },
-    { value: 'other', label: t("categories.other", { defaultValue: 'Other' }), icon: faBox, color: 'bg-slate-50 text-slate-600 border-slate-100' },
-  ]
+  const CATEGORIES: CustomSelectOption<ProductCategory>[] = Object.entries(CATEGORY_CONFIG).map(([key, config]) => ({
+    value: key as ProductCategory,
+    label: t(config.i18nKey, { defaultValue: config.defaultLabel }),
+    icon: config.icon,
+    color: `${config.bg} ${config.text} ${config.border}`
+  }))
 
   useEffect(() => {
     setMounted(true)
@@ -58,16 +58,26 @@ export default function ProductActions() {
 
   return (
     <>
-      {/* Trigger Button - More Formal Design */}
-      <button
-        onClick={() => setIsOpen(true)}
-        className="w-full relative group overflow-hidden bg-slate-900 hover:bg-emerald-500 p-3 rounded-full transition-all duration-300 shadow-xl active:scale-95 cursor-pointer flex flex-col items-center text-center gap-2"
-      >
-        <div className="flex items-center gap-2">
-          <FontAwesomeIcon icon={faPlus} className="text-white text-xl" />
-          <h3 className="text-white font-bold text-lg">{t("home.new_product_title", { defaultValue: 'New Product' })}</h3>
-        </div>
-      </button>
+      {/* Trigger Button - Dynamic Variant */}
+      {variant === 'vertical' ? (
+        <button
+          onClick={() => setIsOpen(true)}
+          className="w-full relative group overflow-hidden bg-slate-900 hover:bg-emerald-500 p-3 rounded-full transition-all duration-300 shadow-xl active:scale-95 cursor-pointer flex flex-col items-center text-center gap-2"
+        >
+          <div className="flex items-center gap-2">
+            <FontAwesomeIcon icon={faPlus} className="text-white text-xl" />
+            <h3 className="text-white font-bold text-lg">{t("home.new_product_title", { defaultValue: 'New Product' })}</h3>
+          </div>
+        </button>
+      ) : (
+        <button
+          onClick={() => setIsOpen(true)}
+          className="flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-800 text-white font-bold text-sm px-6 py-4 rounded-[1.5rem] transition-all duration-200 shadow-xl active:scale-95 cursor-pointer"
+        >
+          <FontAwesomeIcon icon={faPlus} className="w-5 h-5" />
+          {t("home.new_product_title", { defaultValue: 'New Product' })}
+        </button>
+      )}
 
       {/* Modal - More Formal and Functional */}
       {isOpen && mounted && createPortal(

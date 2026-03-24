@@ -21,7 +21,9 @@
   },
   "nav": {
     "home": "Inicio",
-    "catalog": "Catálogo"
+    "catalog": "Catálogo",
+    "scan": "Escanear",
+    "stats": "Estadísticas"
   },
   "footer": {
     "tagline": "Transformando la gestión de tu compra diaria en una experiencia sencilla, rápida y elegante.",
@@ -136,7 +138,7 @@
     "title": "Base de Datos",
     "subtitle": "Buscador global de productos de tu cuenta",
     "global_catalog": "Catálogo Global",
-    "back": "Volver",
+    "total_count": "{{count}} productos",
     "search_placeholder": "Buscar por nombre...",
     "no_products": "No se encontraron productos",
     "no_products_desc": "Prueba con otra búsqueda o categoría",
@@ -213,5 +215,49 @@
     "success": {
       "profile_updated": "Perfil actualizado correctamente"
     }
+  },
+  "stats": {
+    "global_stats": "Análisis y Datos",
+    "title": "Estadísticas Globales",
+    "subtitle": "Analiza tus hábitos de compra y tu base de datos.",
+    "overview_title": "Resumen General",
+    "units": "Unidades",
+    "total_lists": "Listas Totales",
+    "completed_lists": "Completadas",
+    "total_spent": "Total Gastado",
+    "completion_rate": "Ratio de Éxito",
+    "amount_shops": "Tiendas Usadas",
+    "total_products": "Productos Totales",
+    "lists_by_shop": "Listas de compra por Supermercado",
+    "avg_expense_by_shop": "Gasto Medio por Supermercado (€)",
+    "products_by_category": "Productos por Categoría",
+    "cheapest_shop_label": "Supermercado más barato",
+    "cheapest_shop_info": "Basado en el ticket medio de tus compras históricas finalizadas.",
+    "avg_expense_label": "Gasto Medio",
+    "total_spent_desc": "Suma de todas las compras finalizadas",
+    "completed_lists_label": "listas completadas",
+    "products_in_catalog": "En tu catálogo global",
+    "empty_data": "Aún no hay suficientes datos."
+  },
+  "scan": {
+    "title": "Escanear Lista de Compra",
+    "subtitle": "Sube una foto de tu lista de la compra escrita a mano y la digitalizaremos automáticamente.",
+    "format_title": "Formato esperado",
+    "format_complete": "Lista completa",
+    "format_continuation": "Página de continuación",
+    "drop_title": "Arrastra tus imágenes aquí",
+    "drop_subtitle": "o haz clic para buscar archivos",
+    "selected_images": "Imágenes seleccionadas",
+    "scan_button": "Escanear Lista de Compra",
+    "scanning": "Analizando imágenes...",
+    "success_title": "¡Lista creada con éxito!",
+    "success_subtitle": "{{count}} productos añadidos a tu lista",
+    "success_message": "Lista \"{{name}}\" creada con {{count}} productos",
+    "error_title": "Error en el escaneo",
+    "error_scan": "Error al escanear las imágenes",
+    "try_again": "Intentar de nuevo",
+    "products_detected": "Productos detectados",
+    "view_list": "Ver lista",
+    "scan_another": "Escanear otra lista"
   }
 }

@@ -5,6 +5,7 @@ import "flag-icons/css/flag-icons.min.css"
 import { ShoppingListProvider } from "@/shopping-list/contexts/ShoppingListContext"
 import { ShoppingListItemsProvider } from "@/shopping-list-item/contexts/ShoppingListItemsContext"
 import { ProductProvider } from "@/product/contexts/ProductContext"
+import { ScanListProvider } from "@/scan-list/contexts/ScanListContext"
 import FloatingBackground from "@/components/ui/FloatingBackground"
 import Header from "@/components/layout/Header"
 import Footer from "@/components/layout/Footer"
@@ -43,7 +44,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <ShoppingListProvider>
                   <ProductProvider>
                     <ShoppingListItemsProvider>
-                      {children}
+                      <ScanListProvider>
+                        {children}
+                      </ScanListProvider>
                     </ShoppingListItemsProvider>
                   </ProductProvider>
                 </ShoppingListProvider>
