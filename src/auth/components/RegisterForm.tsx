@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { useAuth } from "../hooks/useAuth";
+import { RegisterData } from "../entity/User";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { useI18n } from "../../i18n/hooks/useI18n";
@@ -9,7 +10,7 @@ import { useI18n } from "../../i18n/hooks/useI18n";
 export const RegisterForm = () => {
     const { register } = useAuth();
     const { t } = useI18n();
-    const [formData, setFormData] = useState({
+    const [formData, setFormData] = useState<RegisterData & { confirmPassword: "" }>({
         first_name: "",
         last_name: "",
         email: "",
@@ -119,8 +120,8 @@ export const RegisterForm = () => {
                         <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
                     </button>
                 </div>
-                <p className={`text-xs ml-1 font-bold transition-colors ${formData.password.length > 8 ? 'text-emerald-600' : 'text-slate-400'}`}>
-                    {formData.password.length > 8 ? '✓' : '•'} {t("auth.password_rule", { defaultValue: "Debe tener más de 8 caracteres" })}
+                <p className={`text-xs ml-1 font-bold transition-colors ${(formData.password ?? "").length > 8 ? 'text-emerald-600' : 'text-slate-400'}`}>
+                    {(formData.password ?? "").length > 8 ? '✓' : '•'} {t("auth.password_rule", { defaultValue: "Debe tener más de 8 caracteres" })}
                 </p>
             </div>
             
@@ -147,7 +148,7 @@ export const RegisterForm = () => {
 
             <button
                 type="submit"
-                disabled={loading || (formData.password.length > 0 && formData.password.length <= 8)}
+                disabled={loading || ((formData.password ?? "").length > 0 && (formData.password ?? "").length <= 8)}
                 className="mt-4 w-full text-white bg-emerald-500 hover:bg-emerald-600 focus:ring-4 focus:outline-none focus:ring-emerald-300 font-bold rounded-2xl text-base px-5 py-4 text-center transition-all duration-300 shadow-lg shadow-emerald-500/30 disabled:opacity-50 hover:-translate-y-1 active:translate-y-0"
             >
                 {loading ? t("auth.registering", { defaultValue: "Registrando..." }) : t("auth.register", { defaultValue: "Registrarse" })}

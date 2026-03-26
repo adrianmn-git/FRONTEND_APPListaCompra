@@ -28,9 +28,11 @@ export default function AddShoppingListItemForm({ listId }: Props) {
   const { t } = useI18n()
 
   const [isOpen, setIsOpen] = useState(false)
-  const [productId, setProductId] = useState<number | "">("")
-  const [quantity, setQuantity] = useState(1)
-  const [unit, setUnit] = useState<UnitType>("unit")
+  const [formData, setFormData] = useState<{ productId: number | ""; quantity: number; unit: UnitType }>({
+    productId: "",
+    quantity: 1,
+    unit: "unit"
+  })
   const [isLoading, setIsLoading] = useState(false)
   const [mounted, setMounted] = useState(false)
 
@@ -45,14 +47,12 @@ export default function AddShoppingListItemForm({ listId }: Props) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (productId === "") return
+    if (formData.productId === "") return
 
     setIsLoading(true)
     try {
-      await addItem({ shopping_list: listId, product: productId as number, quantity, unit })
-      setProductId("")
-      setQuantity(1)
-      setUnit("unit")
+      await addItem({ shopping_list: listId, product: formData.productId as number, quantity: formData.quantity, unit: formData.unit })
+      setFormData({ productId: "", quantity: 1, unit: "unit" })
       setIsOpen(false)
     } finally {
       setIsLoading(false)
@@ -63,7 +63,7 @@ export default function AddShoppingListItemForm({ listId }: Props) {
     <>
       <button
         onClick={handleOpen}
-        className="flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white font-bold text-sm px-6 py-3 rounded-2xl transition-all duration-200 shadow-lg active:scale-95 cursor-pointer"
+        className="flex items-center justify-center gap-2 w-full xl:w-auto h-12 bg-slate-900 hover:bg-slate-800 text-white font-bold text-[13px] px-8 rounded-2xl transition-all duration-300 shadow-[0_8px_20px_-6px_rgba(15,23,42,0.5)] active:scale-95 cursor-pointer"
       >
         <FontAwesomeIcon icon={faPlus} className="w-4 h-4" />
         {t("list.add_product", { defaultValue: 'Add Product' })}
@@ -71,11 +71,11 @@ export default function AddShoppingListItemForm({ listId }: Props) {
 
       {isOpen && mounted && createPortal(
         <div 
-          className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300"
+          className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6 bg-slate-900/40 backdrop-blur-md animate-in fade-in duration-300"
           onClick={() => setIsOpen(false)}
         >
           <div 
-            className="bg-white rounded-[2rem] p-8 w-full max-w-md shadow-2xl border border-slate-100 animate-in zoom-in slide-in-from-bottom-4 duration-400 relative overflow-y-auto max-h-[90vh]"
+            className="bg-white/95 backdrop-blur-xl rounded-[2.5rem] p-8 md:p-10 w-full max-w-md shadow-2xl border border-white/50 animate-in zoom-in-95 slide-in-from-bottom-8 duration-500 relative overflow-y-auto max-h-[90vh]"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex justify-between items-center mb-8">
@@ -91,14 +91,14 @@ export default function AddShoppingListItemForm({ listId }: Props) {
             <form onSubmit={handleSubmit} className="space-y-6">
               <CustomSelect
                 label={t("modals.product_label", { defaultValue: 'Product' })}
-                value={productId}
+                value={formData.productId}
                 placeholder={t("modals.product_placeholder", { defaultValue: 'Search a product...' })}
                 options={products.map(p => ({
                   value: p.id,
                   label: p.name,
                   icon: faBasketShopping
                 }))}
-                onChange={(val) => setProductId(val as number)}
+                onChange={(val) => setFormData({ ...formData, productId: val as number })}
               />
 
               <div className="grid grid-cols-2 gap-4">
@@ -107,20 +107,20 @@ export default function AddShoppingListItemForm({ listId }: Props) {
                   <input
                     type="number"
                     min={1}
-                    value={quantity}
-                    onChange={(e) => setQuantity(Math.max(1, Number(e.target.value)))}
+                    value={formData.quantity}
+                    onChange={(e) => setFormData({ ...formData, quantity: Math.max(1, Number(e.target.value)) })}
                     className="w-full h-11 bg-slate-50 border-2 border-slate-100 rounded-xl px-5 text-slate-800 font-bold focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-400 transition-all"
                   />
                 </div>
 
                 <CustomSelect
                   label={t("modals.unit_label", { defaultValue: 'Unit' })}
-                  value={unit}
+                  value={formData.unit}
                   options={UNIT_OPTIONS.map(opt => ({
                     ...opt,
                     label: t(`units.${opt.value}`, { defaultValue: opt.label })
                   }))}
-                  onChange={(val) => setUnit(val as UnitType)}
+                  onChange={(val) => setFormData({ ...formData, unit: val as UnitType })}
                 />
               </div>
 
@@ -134,7 +134,7 @@ export default function AddShoppingListItemForm({ listId }: Props) {
                 </button>
                 <button
                   type="submit"
-                  disabled={isLoading || productId === ""}
+                  disabled={isLoading || formData.productId === ""}
                   className="flex-[2] bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-2xl shadow-lg shadow-indigo-100 hover:shadow-indigo-200 transition-all duration-200 active:scale-[0.98] cursor-pointer disabled:opacity-50"
                 >
                   {isLoading ? t("common.adding", { defaultValue: 'Adding...' }) : t("common.add", { defaultValue: 'Add' })}

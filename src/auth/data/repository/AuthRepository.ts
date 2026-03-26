@@ -16,7 +16,7 @@ export class AuthRepository {
         return this.dataSource.register(data);
     }
 
-    async updateProfile(userId: number, data: UpdateUserData, token: string): Promise<AuthResponse> {
-         return this.dataSource.updateProfile(userId, data, token);
+    async updateProfile(userId: number, data: UpdateUserData): Promise<AuthResponse> {
+         return this.dataSource.updateProfile(userId, data);
     }
 }

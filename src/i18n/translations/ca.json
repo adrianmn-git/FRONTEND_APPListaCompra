@@ -49,7 +49,11 @@
     "new_product_desc": "Afegiu aliments a la base de dades global per utilitzar-los més tard.",
     "explore_catalog": "Veure Catàleg",
     "explore_desc": "Busca i filtra tots els productes emmagatzemats.",
-    "explore_btn": "Explorar BD"
+    "explore_btn": "Explorar BD",
+    "advanced_tools": "Eines Avançades",
+    "smart_features": "Funcionalitats Intel·ligents",
+    "go_to_scan": "Anar a Escanejar",
+    "go_to_stats": "Veure Estadístiques"
   },
   "list": {
     "items_count": "Productes",

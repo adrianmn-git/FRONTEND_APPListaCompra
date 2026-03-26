@@ -76,7 +76,7 @@ export default function ShoppingListFilters({
   }
 
   return (
-    <div className="flex flex-col gap-6 mb-8">
+    <div className="flex flex-col gap-6">
       {/* Search and Status Toggle Row */}
       <div className="flex flex-col md:flex-row gap-4">
         {/* Search Bar */}
@@ -88,8 +88,8 @@ export default function ShoppingListFilters({
             type="text"
             value={searchTerm}
             onChange={(e) => onSearchChange(e.target.value)}
-            placeholder={t("filters.search_placeholder", { defaultValue: 'Search by name...' })}
-            className="w-full bg-white border-2 border-slate-100 rounded-xl pl-12 pr-4 h-11 text-slate-700 font-semibold focus:outline-none focus:ring-4 focus:ring-indigo-500/5 focus:border-indigo-400 transition-all shadow-sm"
+            placeholder={t("filters.search_placeholder", { defaultValue: 'Search products...' })}
+            className="w-full bg-[#F8FAFC] border border-slate-100 rounded-2xl pl-12 pr-4 h-12 text-slate-700 font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500/20 hover:bg-white hover:shadow-md transition-all placeholder:text-slate-400"
           />
         </div>
 
@@ -110,31 +110,37 @@ export default function ShoppingListFilters({
             {t("filters.shown_count", { current: filteredCount, total: totalCount, defaultValue: `Showing {{current}} of {{total}}` })}
           </span>
         </div>
-        <div className="flex flex-wrap gap-2 pt-1 pb-2">
+        <div className="flex flex-nowrap overflow-x-auto gap-2 pt-1 pb-2 hide-scrollbar items-center">
           <button
             onClick={onClearCategories}
-            className={`px-4 py-2.5 rounded-xl text-sm font-bold border-2 transition-all cursor-pointer ${
+            className={`px-5 py-2.5 shrink-0 rounded-2xl text-[13px] font-bold transition-all duration-300 cursor-pointer flex items-center gap-2 ${
               selectedCategories.length === 0
-                ? 'bg-slate-800 border-slate-800 text-white shadow-lg'
-                : 'bg-white border-slate-100 text-slate-400 hover:border-slate-200 hover:text-slate-600 shadow-sm'
+                ? 'bg-slate-900 text-white'
+                : 'bg-[#F8FAFC] text-slate-500 hover:bg-slate-100 border border-slate-100'
             }`}
           >
             {t("filters.all", { defaultValue: 'All' })}
           </button>
+          
+          <div className="h-6 w-px bg-slate-200 mx-1 shrink-0"></div>
+          
           {availableCategories.map((catKey) => {
             const cat = CATEGORY_MAP[catKey] || CATEGORY_MAP.other
             const isActive = selectedCategories.includes(catKey)
+            
+            const activeClasses = `${cat.color} border border-transparent z-10 scale-105`
+            
             return (
               <button
                 key={catKey}
                 onClick={() => onToggleCategory(catKey)}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold border-2 transition-all cursor-pointer ${
+                className={`flex items-center gap-2 px-4 py-2.5 shrink-0 rounded-2xl text-[13px] font-bold transition-all duration-300 cursor-pointer ${
                   isActive
-                    ? `${cat.color} shadow-lg scale-105 z-10`
-                    : 'bg-white border-slate-100 text-slate-400 hover:border-slate-200 hover:text-slate-600 shadow-sm'
+                    ? activeClasses
+                    : 'bg-[#F8FAFC] text-slate-500 hover:bg-slate-100 border border-slate-100'
                 }`}
               >
-                <div className={isActive ? '' : 'grayscale opacity-70'}>
+                <div className={isActive ? '' : 'grayscale opacity-60'}>
                   <FontAwesomeIcon icon={cat.icon} />
                 </div>
                 {cat.label}

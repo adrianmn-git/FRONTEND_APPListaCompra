@@ -8,9 +8,12 @@ import { useI18n } from "@/i18n/hooks/useI18n"
 import LanguageSelector from "@/i18n/components/LanguageSelector"
 import { UserMenu } from "@/auth/components/UserMenu"
 
+import { useAuth } from "@/auth/hooks/useAuth"
+
 export default function Header() {
   const pathname = usePathname()
   const { t } = useI18n()
+  const { user } = useAuth()
 
   const navItems = [
     { name: t("nav.home", { defaultValue: 'Home' }), href: "/", icon: faHouse },
@@ -33,25 +36,27 @@ export default function Header() {
         </Link>
 
         {/* Navigation Links */}
-        <div className="flex items-center gap-1.5 lg:gap-2">
-          {navItems.map((item) => {
-            const isActive = pathname === item.href
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`flex items-center gap-2.5 px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 ${
-                  isActive
-                    ? "bg-indigo-50 text-indigo-700 shadow-sm"
-                    : "text-slate-500 hover:text-slate-800 hover:bg-slate-50"
-                }`}
-              >
-                <FontAwesomeIcon icon={item.icon} className={`text-base ${isActive ? "text-indigo-600" : "text-slate-400"}`} />
-                <span className="hidden sm:inline">{item.name}</span>
-              </Link>
-            )
-          })}
-        </div>
+        {user && (
+          <div className="flex items-center gap-1.5 lg:gap-2">
+            {navItems.map((item) => {
+              const isActive = pathname === item.href
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`flex items-center gap-2.5 px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 ${
+                    isActive
+                      ? "bg-indigo-50 text-indigo-700 shadow-sm"
+                      : "text-slate-500 hover:text-slate-800 hover:bg-slate-50"
+                  }`}
+                >
+                  <FontAwesomeIcon icon={item.icon} className={`text-base ${isActive ? "text-indigo-600" : "text-slate-400"}`} />
+                  <span className="hidden sm:inline">{item.name}</span>
+                </Link>
+              )
+            })}
+          </div>
+        )}
 
         {/* Right Section */}
         <div className="flex items-center gap-6">

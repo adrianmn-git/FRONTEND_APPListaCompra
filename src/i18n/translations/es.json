@@ -49,7 +49,11 @@
     "new_product_desc": "Añade alimentos a tu base de datos global para usarlos después.",
     "explore_catalog": "Ver Catálogo",
     "explore_desc": "Busca y filtra todos los productos almacenados.",
-    "explore_btn": "Explorar BD"
+    "explore_btn": "Explorar BD",
+    "advanced_tools": "Herramientas Avanzadas",
+    "smart_features": "Funcionalidades Inteligentes",
+    "go_to_scan": "Ir a Escanear",
+    "go_to_stats": "Ver Estadísticas"
   },
   "list": {
     "items_count": "Productos",

@@ -22,9 +22,11 @@ export default function EditShoppingListForm({ list, className }: EditShoppingLi
   const { t } = useI18n()
 
   const [isOpen, setIsOpen] = useState(false)
-  const [name, setName] = useState(list.name)
-  const [description, setDescription] = useState(list.description || "")
-  const [shop, setShop] = useState<ShopType>(list.shop)
+  const [formData, setFormData] = useState<{ name: string; description: string; shop: ShopType }>({
+    name: list.name,
+    description: list.description || "",
+    shop: list.shop
+  })
   const [isLoading, setIsLoading] = useState(false)
   const [mounted, setMounted] = useState(false)
 
@@ -42,14 +44,14 @@ export default function EditShoppingListForm({ list, className }: EditShoppingLi
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!name.trim()) return
+    if (!formData.name.trim()) return
 
     setIsLoading(true)
     try {
       await updateList(list.id, {
-        name: name.trim(),
-        shop,
-        description: description.trim() || null
+        name: formData.name.trim(),
+        shop: formData.shop,
+        description: formData.description.trim() || null
       })
       setIsOpen(false)
     } finally {
@@ -94,8 +96,8 @@ export default function EditShoppingListForm({ list, className }: EditShoppingLi
                 <label className="text-[10px] font-black uppercase text-slate-400 ml-1 tracking-wider">{t("modals.name_label", { defaultValue: 'Name' })}</label>
                 <input
                   type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   placeholder={t("modals.name_placeholder", { defaultValue: 'Ex: Weekly Shopping' })}
                   required
                   className="w-full h-11 bg-slate-50 border-2 border-slate-100 rounded-xl px-6 text-slate-800 font-bold placeholder:text-slate-400 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-400 transition-all"
@@ -104,24 +106,24 @@ export default function EditShoppingListForm({ list, className }: EditShoppingLi
 
                 <CustomSelect
                   label={t("modals.shop_label", { defaultValue: 'Supermarket' })}
-                  value={shop}
+                  value={formData.shop}
                   options={SHOPS}
-                  onChange={(val) => setShop(val)}
+                  onChange={(val) => setFormData({ ...formData, shop: val as ShopType })}
                 />
 
               <div className="flex flex-col gap-1.5">
                 <label className="text-[10px] font-black uppercase text-slate-400 ml-1 tracking-wider">{t("modals.description_label", { defaultValue: 'Description' })}</label>
                 <textarea
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   placeholder={t("modals.description_placeholder", { defaultValue: 'Add a description...' })}
                   rows={3}
                   maxLength={500}
                   className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-6 py-3 text-slate-600 font-bold placeholder:text-slate-400 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-400 transition-all resize-none min-h-[80px]"
                 />
                 <div className="flex justify-end pr-2">
-                  <span className={`text-[10px] font-black uppercase ${description.length >= 500 ? 'text-red-500' : 'text-slate-400'}`}>
-                    {description.length} / 500
+                  <span className={`text-[10px] font-black uppercase ${formData.description.length >= 500 ? 'text-red-500' : 'text-slate-400'}`}>
+                    {formData.description.length} / 500
                   </span>
                 </div>
               </div>
@@ -136,7 +138,7 @@ export default function EditShoppingListForm({ list, className }: EditShoppingLi
                 </button>
                 <button
                   type="submit"
-                  disabled={isLoading || !name.trim()}
+                  disabled={isLoading || !formData.name.trim()}
                   className="flex-[2] bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-2xl shadow-lg shadow-indigo-100 hover:shadow-indigo-200 transition-all duration-200 active:scale-[0.98] cursor-pointer disabled:opacity-50"
                 >
                   {isLoading ? t("common.loading", { defaultValue: 'Loading...' }) : t("common.save", { defaultValue: 'Save' })}

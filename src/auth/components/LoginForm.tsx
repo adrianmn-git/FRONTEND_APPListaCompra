@@ -9,8 +9,10 @@ import { useI18n } from "../../i18n/hooks/useI18n";
 export const LoginForm = () => {
     const { login } = useAuth();
     const { t } = useI18n();
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
+    const [formData, setFormData] = useState({
+        email: "",
+        password: ""
+    });
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
@@ -19,14 +21,14 @@ export const LoginForm = () => {
         e.preventDefault();
         setError("");
         
-        if (!email || !password) {
+        if (!formData.email || !formData.password) {
             setError(t("auth.errors.fill_fields", { defaultValue: "Por favor, rellena todos los campos" }));
             return;
         }
 
         setLoading(true);
         try {
-            await login({ email, password });
+            await login({ email: formData.email, password: formData.password });
             // The AuthContext router.push will handle redirect or we let the page handle it
         } catch (err: any) {
             setError(err.message || t("auth.errors.login_fail", { defaultValue: "Error al iniciar sesión" }));
@@ -44,8 +46,8 @@ export const LoginForm = () => {
                 <input
                     id="email"
                     type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     className="w-full bg-white border-2 border-slate-200 text-slate-800 text-sm rounded-2xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 block p-4 transition-all outline-none font-medium placeholder-slate-400 shadow-sm"
                     placeholder={t("auth.email_placeholder", { defaultValue: "tu@email.com" })}
                 />
@@ -57,8 +59,8 @@ export const LoginForm = () => {
                     <input
                         id="password"
                         type={showPassword ? "text" : "password"}
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
+                        value={formData.password}
+                        onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                         className="w-full bg-white border-2 border-slate-200 text-slate-800 text-sm rounded-2xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 block p-4 pr-12 transition-all outline-none font-medium placeholder-slate-400 shadow-sm"
                         placeholder={t("auth.password_placeholder", { defaultValue: "••••••••" })}
                     />

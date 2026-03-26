@@ -27,9 +27,10 @@ const CATEGORY_ICONS: Record<string, IconDefinition> = {
 
 interface Props {
   item: ShoppingListItem
+  disabled?: boolean
 }
 
-export default function ShoppingListItemCard({ item }: Props) {
+export default function ShoppingListItemCard({ item, disabled = false }: Props) {
   const { updateItem, removeItem } = useShoppingListItems()
   const { products } = useProduct()
   const { t } = useI18n()
@@ -71,6 +72,7 @@ export default function ShoppingListItemCard({ item }: Props) {
     : products.find(p => p.id === (item.product as any))
 
   const togglePickedUp = (e: React.MouseEvent) => {
+    if (disabled) return
     const target = e.target as HTMLElement
     if (target.closest('.item-controls')) return
     updateItem(item.id, { picked_up: !item.picked_up })
@@ -86,7 +88,11 @@ export default function ShoppingListItemCard({ item }: Props) {
   return (
     <div
       onClick={togglePickedUp}
-      className="w-full group relative flex flex-row items-center gap-4 p-3 bg-white border-b border-slate-100 transition-all duration-300 active:scale-[0.99] cursor-pointer select-none overflow-hidden"
+      className={`w-full group relative flex flex-row items-center gap-4 p-4 rounded-2xl transition-all duration-300 cursor-pointer select-none overflow-hidden border border-transparent ${
+        item.picked_up 
+          ? 'bg-slate-100/50 hover:bg-slate-100 active:scale-[0.99] opacity-70' 
+          : 'bg-white hover:bg-white hover:shadow-lg hover:shadow-slate-200/50 hover:-translate-y-0.5 active:scale-[0.99] hover:border-slate-100'
+      }`}
     >
       {/* 1. Category Icon */}
       <div className="group-hover:grayscale-0 transition-all flex items-center gap-3">
@@ -124,33 +130,37 @@ export default function ShoppingListItemCard({ item }: Props) {
       </div>
 
       {/* Controls Container (Quantity & Delete) */}
-      <div className="item-controls flex items-center gap-3 shrink-0" onClick={(e) => e.stopPropagation()}>
+      <div className="item-controls flex items-center gap-2 shrink-0" onClick={(e) => e.stopPropagation()}>
         {/* 4. Quantity Selector */}
-        <div className="flex items-center gap-1 bg-slate-50 border border-slate-100 rounded-xl p-0.5 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-200">
-          <button
-            onClick={() => handleQuantityChange(-1)}
-            disabled={item.picked_up || item.quantity <= 1}
-            className="w-7 h-7 flex items-center justify-center rounded-lg text-slate-400 hover:bg-white hover:text-slate-600 hover:shadow-sm disabled:opacity-20 transition-all cursor-pointer"
-          >
-            <FontAwesomeIcon icon={faMinus} className="text-[10px]" />
-          </button>
+        {!disabled && (
+          <div className="flex items-center gap-1 bg-slate-50 border border-slate-100 rounded-lg p-0.5 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-200">
+            <button
+              onClick={() => handleQuantityChange(-1)}
+              disabled={item.picked_up || item.quantity <= 1}
+              className="w-6 h-6 flex items-center justify-center rounded-md text-slate-400 hover:bg-white hover:text-slate-600 hover:shadow-sm disabled:opacity-20 transition-all cursor-pointer"
+            >
+              <FontAwesomeIcon icon={faMinus} className="text-[9px]" />
+            </button>
 
-          <button
-            onClick={() => handleQuantityChange(1)}
-            disabled={item.picked_up}
-            className="w-7 h-7 flex items-center justify-center rounded-lg text-slate-400 hover:bg-white hover:text-slate-600 hover:shadow-sm disabled:opacity-20 transition-all cursor-pointer"
-          >
-            <FontAwesomeIcon icon={faPlus} className="text-[10px]" />
-          </button>
-        </div>
+            <button
+              onClick={() => handleQuantityChange(1)}
+              disabled={item.picked_up}
+              className="w-6 h-6 flex items-center justify-center rounded-md text-slate-400 hover:bg-white hover:text-slate-600 hover:shadow-sm disabled:opacity-20 transition-all cursor-pointer"
+            >
+              <FontAwesomeIcon icon={faPlus} className="text-[9px]" />
+            </button>
+          </div>
+        )}
 
         {/* 5. Delete Button */}
-        <button
-          onClick={() => removeItem(item.id)}
-          className="w-8 h-8 flex items-center justify-center rounded-xl text-slate-300 hover:text-white hover:bg-red-500 transition-all duration-300 cursor-pointer"
-        >
-          <FontAwesomeIcon icon={faTrash} className="text-xs" />
-        </button>
+        {!disabled && (
+          <button
+            onClick={() => removeItem(item.id)}
+            className="w-8 h-8 flex items-center justify-center rounded-xl text-slate-300 hover:text-white hover:bg-red-500 transition-all duration-300 cursor-pointer"
+          >
+            <FontAwesomeIcon icon={faTrash} className="text-[11px]" />
+          </button>
+        )}
       </div>
     </div>
   )

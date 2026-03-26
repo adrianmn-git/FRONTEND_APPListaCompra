@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../hooks/useAuth";
+import { UpdateUserData } from "../entity/User";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { useI18n } from "../../i18n/hooks/useI18n";
@@ -9,7 +10,7 @@ import { useI18n } from "../../i18n/hooks/useI18n";
 export const ProfileForm = () => {
     const { user, updateProfile } = useAuth();
     const { t } = useI18n();
-    const [formData, setFormData] = useState({
+    const [formData, setFormData] = useState<UpdateUserData & { confirmPassword: "" }>({
         first_name: "",
         last_name: "",
         email: "",
@@ -144,8 +145,8 @@ export const ProfileForm = () => {
                         <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
                     </button>
                 </div>
-                <div className={`text-xs ml-1 font-bold transition-colors ${formData.password.length === 0 ? 'hidden' : formData.password.length > 8 ? 'text-emerald-600' : 'text-slate-400'}`}>
-                    {formData.password.length > 8 ? '✓' : '•'} {t("auth.password_rule", { defaultValue: "Debe tener más de 8 caracteres" })}
+                <div className={`text-xs ml-1 font-bold transition-colors ${(formData.password ?? "").length === 0 ? 'hidden' : (formData.password ?? "").length > 8 ? 'text-emerald-600' : 'text-slate-400'}`}>
+                    {(formData.password ?? "").length > 8 ? '✓' : '•'} {t("auth.password_rule", { defaultValue: "Debe tener más de 8 caracteres" })}
                 </div>
             </div>
             
@@ -174,7 +175,7 @@ export const ProfileForm = () => {
             <div className="mt-4 flex justify-end">
                 <button
                     type="submit"
-                    disabled={loading || (formData.password.length > 0 && formData.password.length <= 8)}
+                    disabled={loading || ((formData.password ?? "").length > 0 && (formData.password ?? "").length <= 8)}
                     className="w-full sm:w-auto text-white bg-indigo-600 hover:bg-indigo-700 focus:ring-4 focus:outline-none focus:ring-indigo-300 font-bold rounded-2xl text-base px-8 py-3.5 text-center transition-all duration-300 shadow-lg shadow-indigo-600/30 disabled:opacity-50 hover:-translate-y-1 active:translate-y-0"
                 >
                     {loading ? t("auth.updating", { defaultValue: "Actualizando..." }) : t("auth.save_changes", { defaultValue: "Guardar Cambios" })}

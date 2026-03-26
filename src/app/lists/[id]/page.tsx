@@ -10,7 +10,7 @@ import AddShoppingListItemForm from '@/shopping-list-item/components/AddShopping
 import ShoppingListFilters from '@/shopping-list-item/components/ShoppingListFilters'
 import { useProduct } from '@/product/hooks/useProduct'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faChevronLeft, faCheck, faTrash, faBasketShopping, faSearch, faEuroSign, faPenToSquare, faStore, faTruck, faCartShopping, faBuilding } from '@fortawesome/free-solid-svg-icons'
+import { faChevronLeft, faCheck, faTrash, faBasketShopping, faSearch, faEuroSign, faPenToSquare, faStore, faTruck, faCartShopping, faBuilding, faPen } from '@fortawesome/free-solid-svg-icons'
 import EditShoppingListForm from '@/shopping-list/components/EditShoppingListForm'
 import FinalPriceModal from '@/shopping-list/components/FinalPriceModal'
 import ConfirmModal from '@/components/ui/ConfirmModal'
@@ -126,184 +126,210 @@ export default function ShoppingListDetailsPage() {
   const currentShopTheme = SHOP_THEMES[list.shop] || { label: list.shop, icon: faStore, bg: "bg-slate-800", text: "text-white" }
 
   return (
-    <main className="min-h-screen bg-transparent relative overflow-hidden">
-      {/* Background Decor */}
-      <div className="absolute top-0 right-0 w-full h-[500px] bg-gradient-to-br from-indigo-50/50 via-purple-50/30 to-slate-50 -z-10 blur-3xl rounded-full translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
+    <main className="min-h-screen bg-[#F8FAFC] relative overflow-x-hidden font-sans pb-32">
+      {/* 1. SEAMLESS AMBIENT BACKGROUND */}
+      <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.03] pointer-events-none mix-blend-multiply z-0"></div>
+      
+      {/* Massive soft glowing blobs that fade seamlessly */}
+      <div className="absolute top-0 left-0 w-full h-[600px] overflow-hidden pointer-events-none z-0">
+        <div className={`absolute -top-[20%] -left-[10%] w-[60%] h-[120%] ${currentShopTheme.bg.replace('bg-', 'from-')}/15 via-transparent to-transparent bg-gradient-to-br blur-[100px] rounded-[100%] transform -rotate-12`}></div>
+        <div className={`absolute top-[10%] -right-[10%] w-[50%] h-[100%] ${currentShopTheme.bg.replace('bg-', 'from-')}/10 via-transparent to-transparent bg-gradient-to-bl blur-[120px] rounded-[100%] transform rotate-12`}></div>
+        <div className="absolute top-[30%] left-[20%] w-[40%] h-[80%] bg-indigo-400/5 blur-[120px] rounded-[100%]"></div>
+      </div>
 
-      <div className="max-w-6xl mx-auto px-6 py-12 lg:py-16">
-
-        {/* Supermarket Top Band */}
-        <div className={`w-full rounded-[2rem] mb-6 px-6 py-3.5 flex items-center justify-center gap-3 shadow-lg shadow-${currentShopTheme.bg.split('-')[1]}-500/30 transition-all ${currentShopTheme.bg} outline outline-4 outline-white`}>
-          {SHOP_CONFIG[list.shop as keyof typeof SHOP_CONFIG]?.logoUrl ? (
-            <div className="w-10 h-10 bg-white p-0.5 rounded-2xl shadow-sm flex items-center justify-center -my-1 shrink-0 overflow-hidden transform rotate-2 hover:rotate-0 transition-transform">
-              <img src={SHOP_CONFIG[list.shop as keyof typeof SHOP_CONFIG].logoUrl} alt={currentShopTheme.label} className="w-full h-full object-cover rounded-[14px]" />
-            </div>
-          ) : (
-            <FontAwesomeIcon icon={currentShopTheme.icon} className={`text-xl ${currentShopTheme.text}`} />
-          )}
-          <span className={`font-black uppercase tracking-widest text-sm ${currentShopTheme.text}`}>{currentShopTheme.label}</span>
-        </div>
-
-        {/* Navigation & Header */}
-        <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-6 mb-10 w-full">
-          {/* Top row: back + title + badges */}
-          <div className="flex items-center gap-4 min-w-0">
-            <button
-              onClick={() => router.push('/')}
-              aria-label={t("common.go_back", { defaultValue: 'Go back' })}
-              className="bg-white/80 backdrop-blur-md w-12 h-12 flex items-center justify-center rounded-2xl border border-white shadow-xl shadow-slate-200/50 text-slate-400 hover:text-indigo-600 transition-all hover:-translate-x-1 active:scale-95 cursor-pointer shrink-0"
-            >
-              <FontAwesomeIcon icon={faChevronLeft} className="w-5 h-5" />
-            </button>
-            <div className="flex flex-col gap-1.5 min-w-0">
-              <h1 className="text-3xl md:text-5xl font-black text-slate-800 drop-shadow-sm truncate leading-tight">
-                {list.name}
-              </h1>
-              <div className="flex flex-wrap items-center gap-2">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 pt-16">
+        
+        {/* 2. BENTO GRID HEADER */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-12">
+          
+          {/* Main Info Box (Spans 8 cols) */}
+          <div className="lg:col-span-8 bg-white rounded-[2.5rem] shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] border border-slate-100/60 p-8 sm:p-10 flex flex-col justify-between group overflow-hidden relative">
+            <div className="absolute -right-32 -bottom-32 w-64 h-64 bg-slate-50 rounded-full blur-3xl opacity-50 transition-opacity pointer-events-none"></div>
+            
+            <div className="relative z-10">
+              <div className="flex flex-wrap items-center gap-3 mb-6">
+                <div className={`flex items-center gap-2 px-4 py-1.5 rounded-full shadow-sm text-xs font-black uppercase tracking-widest ${currentShopTheme.bg} text-white`}>
+                  {SHOP_CONFIG[list.shop as keyof typeof SHOP_CONFIG]?.logoUrl ? (
+                    <div className="w-4 h-4 shrink-0 mix-blend-screen opacity-90">
+                      <img src={SHOP_CONFIG[list.shop as keyof typeof SHOP_CONFIG].logoUrl} alt={currentShopTheme.label} className="w-full h-full object-contain" />
+                    </div>
+                  ) : (
+                    <FontAwesomeIcon icon={currentShopTheme.icon} />
+                  )}
+                  {currentShopTheme.label}
+                </div>
+                
                 {list.final_price > 0 && (
-                  <span className="text-xs font-black uppercase text-amber-600 bg-amber-50 px-3 py-1.5 rounded-xl border border-amber-100 shadow-sm flex items-center gap-1.5">
-                     <FontAwesomeIcon icon={faEuroSign} className="text-[10px]" />
-                     {list.final_price.toFixed(2)}
+                  <span className="flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-emerald-100 text-emerald-700 text-xs font-black uppercase tracking-wider shadow-sm border border-emerald-200">
+                    <FontAwesomeIcon icon={faEuroSign} />
+                    {list.final_price.toFixed(2)}
                   </span>
                 )}
               </div>
+
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 tracking-[-0.03em] leading-[1.1] mb-6 drop-shadow-sm break-words">
+                {list.name}
+              </h1>
+
+              {list.description && (
+                <p className="text-slate-500 font-medium text-sm sm:text-base leading-relaxed max-w-2xl bg-[#F8FAFC] px-5 py-4 rounded-2xl border border-slate-100/80 break-words">
+                  {list.description}
+                </p>
+              )}
             </div>
           </div>
 
-          {/* Actions row - Uniform Sizes */}
-          <div className="flex flex-wrap items-center justify-start xl:justify-end gap-8 shrink-0">
-            {!list.completed && (
-              <div className="flex items-center gap-3">
-                {pickedCount < totalItems && totalItems > 0 && (
-                  <span className="text-[10px] font-bold text-amber-600 bg-amber-50 h-12 px-4 rounded-2xl border border-amber-100 hidden sm:inline-flex items-center gap-1.5 whitespace-nowrap shadow-sm">
-                    <FontAwesomeIcon icon={faCheck} className="text-[8px] text-amber-400" />
-                    {t("notifications.picked_all_needed", { defaultValue: 'Collect all products to complete' })}
-                  </span>
-                )}
+          {/* Stats & Actions (Spans 4 cols, arranged vertically) */}
+          <div className="lg:col-span-4 flex flex-col gap-6">
+            
+            {/* Progress Stats Box */}
+            <div className="bg-[#0F172A] rounded-[2.5rem] p-8 shadow-[0_20px_40px_-15px_rgba(15,23,42,0.3)] text-white flex-1 flex flex-col justify-center relative overflow-hidden group">
+              <div className="absolute inset-0 bg-[url('/noise.png')] opacity-10 mix-blend-overlay"></div>
+              <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-[80px] pointer-events-none"></div>
+              <div className={`absolute bottom-0 left-0 w-32 h-32 ${currentShopTheme.bg.replace('bg-', 'bg-')}/10 rounded-full blur-[60px] pointer-events-none`}></div>
+              
+              <div className="relative z-10">
+                <div className="flex justify-between items-end mb-4">
+                  <div>
+                    <span className="text-xs font-bold text-slate-400 uppercase tracking-widest block mb-1">{t("list.progress", { defaultValue: 'Progress' })}</span>
+                    <span className="text-4xl font-black tracking-tighter">{Math.round(progress)}<span className="text-2xl text-slate-500">%</span></span>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-2xl font-black text-emerald-400">{pickedCount}</span>
+                    <span className="text-slate-500 text-sm font-bold"> / {totalItems}</span>
+                  </div>
+                </div>
+                
+                <div className="h-3 w-full bg-slate-800 rounded-full overflow-hidden shadow-inner border border-slate-700">
+                  <div
+                    className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full transition-all duration-1000 ease-out relative"
+                    style={{ width: `${progress}%` }}
+                  >
+                    <div className="absolute top-0 right-0 bottom-0 w-8 bg-white/20 blur-[2px]"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Actions Box */}
+            <div className="bg-white rounded-[2rem] shadow-[0_10px_30px_-10px_rgba(0,0,0,0.05)] border border-slate-100/60 p-3 shrink-0">
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2">
+                  {list.completed ? (
+                    <div className="w-14 h-14 flex items-center justify-center bg-[#F8FAFC] text-slate-300 rounded-2xl opacity-60 cursor-not-allowed">
+                      <FontAwesomeIcon icon={faPen} className="w-4 h-4" />
+                    </div>
+                  ) : (
+                    <EditShoppingListForm 
+                      list={list} 
+                      className="w-14 h-14 flex items-center justify-center bg-[#F8FAFC] hover:bg-slate-100 text-slate-400 hover:text-slate-700 rounded-2xl transition-all active:scale-95 cursor-pointer group"
+                    />
+                  )}
+                  <button
+                    onClick={handleDeleteList}
+                    disabled={list.completed}
+                    aria-label={t("list.delete_title", { defaultValue: 'Delete' })}
+                    className={`w-14 h-14 flex items-center justify-center rounded-2xl transition-all ${
+                      list.completed
+                        ? 'bg-[#F8FAFC] text-slate-300 opacity-60 cursor-not-allowed'
+                        : 'bg-[#F8FAFC] hover:bg-red-50 text-slate-400 hover:text-red-500 active:scale-95 cursor-pointer group'
+                    }`}
+                    title={t("list.delete_title", { defaultValue: 'Delete list?' })}
+                  >
+                    <FontAwesomeIcon icon={faTrash} className={`w-4 h-4 ${!list.completed ? 'group-hover:scale-110 transition-transform' : ''}`} />
+                  </button>
+                </div>
+
                 <button
                   onClick={handleCompleteList}
-                  disabled={pickedCount < totalItems || totalItems === 0}
-                  className={`h-12 font-black text-[11px] md:text-xs uppercase px-5 md:px-6 rounded-2xl transition-all duration-300 shadow-lg flex items-center justify-center gap-2 whitespace-nowrap ${
-                    pickedCount < totalItems || totalItems === 0
-                      ? 'bg-slate-200 text-slate-400 shadow-slate-100 cursor-not-allowed'
-                      : 'bg-gradient-to-br from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white shadow-emerald-200 hover:shadow-emerald-300 hover:-translate-y-0.5 active:scale-95 cursor-pointer'
+                  disabled={list.completed || pickedCount < totalItems || totalItems === 0}
+                  className={`h-14 flex-1 flex items-center justify-center gap-2 font-black text-[12px] uppercase tracking-wider rounded-2xl transition-all duration-300 ${
+                    list.completed
+                      ? 'bg-slate-100 text-slate-400 opacity-60 cursor-not-allowed border border-slate-200'
+                      : pickedCount < totalItems || totalItems === 0
+                        ? 'bg-[#F8FAFC] text-slate-400 cursor-not-allowed'
+                        : 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-600/20 hover:shadow-indigo-600/30 cursor-pointer active:scale-95'
                   }`}
                 >
-                  <FontAwesomeIcon icon={faCheck} className="w-4 h-4" />
-                  {t("list.complete", { defaultValue: 'Complete Purchase' })}
+                  <FontAwesomeIcon icon={faCheck} className="text-sm" />
+                  <span className="hidden sm:inline">{list.completed ? t("list.completed", { defaultValue: 'Completed' }) : t("list.complete", { defaultValue: 'Complete' })}</span>
                 </button>
               </div>
-            )}
-
-            <div className="flex items-center gap-3">
-              <EditShoppingListForm 
-                list={list} 
-                className="w-12 h-12 bg-white hover:bg-indigo-50 text-slate-400 hover:text-indigo-600 rounded-2xl border border-slate-100 shadow-lg shadow-slate-200/30 transition-all hover:scale-105 active:scale-95 cursor-pointer flex items-center justify-center icon-lg"
-              />
-              <button
-                onClick={handleDeleteList}
-                aria-label={t("list.delete_title", { defaultValue: 'Delete list?' })}
-                className="w-12 h-12 bg-white hover:bg-red-50 text-red-400 hover:text-red-500 rounded-2xl border border-red-50 shadow-lg shadow-red-100/30 transition-all hover:scale-105 active:scale-95 cursor-pointer flex items-center justify-center"
-                title={t("list.delete_title", { defaultValue: 'Delete list?' })}
-              >
-                <FontAwesomeIcon icon={faTrash} className="w-4 h-4" />
-              </button>
             </div>
+
           </div>
         </div>
 
         {/* --- CELEBRATION BANNER FOR COMPLETED LISTS --- */}
         {list.completed && (
-          <div className="w-full bg-gradient-to-br from-emerald-400 to-teal-500 rounded-[2rem] p-6 sm:p-8 mb-10 shadow-2xl shadow-emerald-200/50 flex flex-col sm:flex-row items-center justify-between gap-6 relative overflow-hidden animate-in fade-in zoom-in-95 duration-500 border border-emerald-300">
+          <div className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 rounded-[2.5rem] p-8 md:p-10 mb-12 shadow-2xl shadow-emerald-500/20 flex flex-col sm:flex-row items-center justify-between gap-6 relative overflow-hidden animate-in fade-in zoom-in-95 duration-700">
             {/* Abstract Background Decor */}
-            <div className="absolute -right-8 -top-12 w-48 h-48 bg-white/20 blur-3xl rounded-full pointer-events-none"></div>
-            <div className="absolute right-20 -bottom-12 w-32 h-32 bg-teal-400/40 blur-2xl rounded-full pointer-events-none"></div>
+            <div className="absolute inset-0 bg-[url('/noise.png')] opacity-20 mix-blend-overlay"></div>
+            <div className="absolute -top-32 -right-10 w-96 h-96 bg-white/20 blur-[80px] rounded-full pointer-events-none"></div>
             
-            <div className="flex items-center gap-5 relative z-10 w-full sm:w-auto">
-              <div className="w-16 h-16 bg-white shrink-0 rounded-2xl flex items-center justify-center shadow-lg transform -rotate-3 hover:rotate-0 transition-transform cursor-default">
-                <FontAwesomeIcon icon={faCheck} className="text-3xl text-emerald-500" />
+            <div className="flex flex-col sm:flex-row items-center gap-6 relative z-10 w-full sm:w-auto text-center sm:text-left">
+              <div className="w-20 h-20 bg-white/20 backdrop-blur-md rounded-[2rem] flex items-center justify-center shadow-lg transform -rotate-6 border border-white/30">
+                <FontAwesomeIcon icon={faCheck} className="text-4xl text-white drop-shadow-md" />
               </div>
-              <div className="flex flex-col">
-                <h2 className="text-2xl font-black text-white tracking-tight drop-shadow-sm">
-                  {t("list.completed", { defaultValue: 'Completed' })}
+              <div className="flex flex-col gap-1">
+                <h2 className="text-3xl font-black text-white tracking-tight drop-shadow-sm">
+                  {t("list.completed", { defaultValue: 'Purchase Completed' })}
                 </h2>
-                <p className="text-emerald-50 font-bold text-sm mt-1 opacity-90">
-                  {t("notifications.list_completed", { defaultValue: 'Purchase completed successfully!' })}
+                <p className="text-emerald-50/90 font-bold text-sm">
+                  {t("notifications.list_completed", { defaultValue: 'Everything is collected and finished.' })}
                 </p>
               </div>
             </div>
 
-            <div className="relative z-10 flex shrink-0 self-start sm:self-center">
-               <span className="bg-white/20 backdrop-blur-md px-5 py-2.5 rounded-xl text-white font-black text-xs uppercase border border-white/30 truncate shadow-sm">
+            <div className="relative z-10 flex shrink-0 sm:self-center w-full sm:w-auto mt-4 sm:mt-0">
+               <span className="w-full sm:w-auto text-center bg-white/20 backdrop-blur-md px-6 py-4 rounded-2xl text-white font-black text-sm uppercase tracking-widest border border-white/30 shadow-lg">
                   {list.final_price > 0 ? `${t("list.final_price", { defaultValue: 'Final Price' })}: ${list.final_price.toFixed(2)}€` : t("list.completed", { defaultValue: 'Completed' })}
                </span>
             </div>
           </div>
         )}
 
-        {/* Description Section (Stand-alone) */}
-        {list.description && (
-          <div className="mb-8 animate-in fade-in slide-in-from-top-2 duration-500">
-            <p className="text-slate-500 text-sm font-medium opacity-80 max-w-full bg-white/40 backdrop-blur-sm px-5 py-4 rounded-2xl border border-white/60 shadow-sm leading-relaxed">
-              {list.description}
-            </p>
-          </div>
-        )}
-
-        {/* Progress Card */}
-        <div className="bg-white/70 backdrop-blur-xl rounded-3xl shadow-2xl shadow-indigo-100/50 border border-white mb-8 overflow-hidden relative group">
-          <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-6 py-5">
-            <div className="flex-1 flex flex-col gap-3">
-              <span className="text-sm font-black text-slate-800 uppercase">{t("list.progress", { defaultValue: 'Shopping Progress' })} — {Math.round(progress)}%</span>
-              <div className="flex gap-3">
-                <div className="flex items-center gap-2 bg-white/60 px-3 py-1 rounded-lg border border-white">
-                  <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
-                  <span className="text-[10px] font-black uppercase text-slate-400">{pickedCount} {t("list.picked", { defaultValue: 'picked' })}</span>
-                </div>
-                <div className="flex items-center gap-2 bg-white/60 px-3 py-1 rounded-lg border border-white">
-                  <div className="w-2 h-2 rounded-full bg-slate-300"></div>
-                  <span className="text-[10px] font-black uppercase text-slate-400">{totalItems - pickedCount} {t("list.pending", { defaultValue: 'pending' })}</span>
-                </div>
-              </div>
-            </div>
-            <AddShoppingListItemForm listId={Number(id)} />
-          </div>
-          <div className="h-4 w-full overflow-hidden">
-            <div
-              className="h-full bg-gradient-to-r from-emerald-200 via-emerald-400 to-emerald-500 rounded-full transition-all duration-1000 ease-out"
-              style={{ width: `${progress}%` }}
-            />
-          </div>
-        </div>
-
         {/* Items List Section */}
-        <div className="flex flex-col gap-6">
-          <ShoppingListFilters
-            searchTerm={searchTerm}
-            onSearchChange={setSearchTerm}
-            selectedCategories={selectedCategories}
-            onToggleCategory={(cat) => {
-              setSelectedCategories(prev => 
-                prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat]
-              )
-            }}
-            onClearCategories={() => setSelectedCategories([])}
-            statusFilter={statusFilter}
-            onStatusChange={setStatusFilter}
-            totalCount={items.length}
-            filteredCount={filteredItems.length}
-            availableCategories={availableCategories}
-          />
+        <div className="flex flex-col gap-8 mb-16">
+          
+          {/* Unified Filter & Add Toolbar */}
+          <div className="bg-white rounded-[2.5rem] p-4 sm:p-6 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.05)] border border-slate-100/60 flex flex-col xl:flex-row justify-between xl:items-start gap-6 relative z-20">
+            <div className="w-full xl:w-auto xl:flex-1">
+              <ShoppingListFilters
+                searchTerm={searchTerm}
+                onSearchChange={setSearchTerm}
+                selectedCategories={selectedCategories}
+                onToggleCategory={(cat) => {
+                  setSelectedCategories(prev => 
+                    prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat]
+                  )
+                }}
+                onClearCategories={() => setSelectedCategories([])}
+                statusFilter={statusFilter}
+                onStatusChange={setStatusFilter}
+                totalCount={items.length}
+                filteredCount={filteredItems.length}
+                availableCategories={availableCategories}
+              />
+            </div>
+            {!list.completed && (
+              <div className="w-full xl:w-auto shrink-0 flex justify-end xl:mt-[4px]">
+                <AddShoppingListItemForm listId={Number(id)} />
+              </div>
+            )}
+          </div>
 
           {loading ? (
             <div className="flex justify-center py-20">
-              <div className="animate-spin rounded-full h-10 w-10 border-b-4 border-indigo-600" />
+              <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-indigo-600" />
             </div>
           ) : items.length === 0 ? (
-            <div className="text-center py-24 bg-white/40 backdrop-blur-md rounded-[3rem] border-2 border-dashed border-white/60 animate-in fade-in zoom-in duration-700">
-              <FontAwesomeIcon icon={faBasketShopping} className="text-7xl mb-6 text-slate-300" />
+            <div className="text-center py-24 bg-white rounded-[3rem] border border-slate-100 shadow-sm animate-in fade-in zoom-in duration-700">
+              <div className="w-24 h-24 bg-slate-50 rounded-[2rem] flex items-center justify-center mx-auto mb-6 shadow-inner border border-slate-100">
+                <FontAwesomeIcon icon={faBasketShopping} className="text-4xl text-slate-300" />
+              </div>
               <h2 className="text-2xl font-black text-slate-800 mb-2">{t("list.empty_state", { defaultValue: 'Your list is empty' })}</h2>
-              <p className="text-slate-500 font-bold mb-8">{t("list.empty_description", { defaultValue: 'Start adding products using the button above' })}</p>
+              <p className="text-slate-500 font-bold max-w-md mx-auto">{t("list.empty_description", { defaultValue: 'Start adding products using the button above to build your perfect shopping list.' })}</p>
             </div>
           ) : (
             <div className="flex flex-col items-center">
@@ -319,9 +345,15 @@ export default function ShoppingListDetailsPage() {
                   </button>
                 </div>
               ) : (
-                filteredItems.map((item) => (
-                  <ShoppingListItemCard key={item.id} item={item} />
-                ))
+                <div className="w-full flex flex-col gap-2">
+                  {filteredItems.map((item) => (
+                    <ShoppingListItemCard 
+                      key={item.id} 
+                      item={item} 
+                      disabled={list.completed} 
+                    />
+                  ))}
+                </div>
               )}
             </div>
           )}

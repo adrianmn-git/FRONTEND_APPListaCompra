@@ -1,16 +1,11 @@
 import { AuthResponse, LoginData, RegisterData, UpdateUserData } from "../../entity/User";
+import { HttpClient } from "../../../shared/HttpClient";
 
 const API_URL = "http://127.0.0.1:8000";
 
 export class AuthDataSource {
     async login(data: LoginData): Promise<AuthResponse> {
-        const res = await fetch(`${API_URL}/auth/login`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(data),
-        });
+        const res = await HttpClient(`${API_URL}/auth/login`, 'POST', JSON.stringify(data));
 
         if (!res.ok) {
             const errorData = await res.json().catch(() => ({}));
@@ -21,13 +16,7 @@ export class AuthDataSource {
     }
 
     async register(data: RegisterData): Promise<AuthResponse> {
-        const res = await fetch(`${API_URL}/auth/register`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(data),
-        });
+        const res = await HttpClient(`${API_URL}/auth/register`, 'POST', JSON.stringify(data));
 
         if (!res.ok) {
             const errorData = await res.json().catch(() => ({}));
@@ -37,15 +26,8 @@ export class AuthDataSource {
         return res.json();
     }
 
-    async updateProfile(userId: number, data: UpdateUserData, token: string): Promise<AuthResponse> {
-        const res = await fetch(`${API_URL}/auth/user/${userId}/update`, {
-            method: "PATCH",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-            },
-            body: JSON.stringify(data),
-        });
+    async updateProfile(userId: number, data: UpdateUserData): Promise<AuthResponse> {
+        const res = await HttpClient(`${API_URL}/auth/user/${userId}/update`, 'PATCH', JSON.stringify(data));
 
         if (!res.ok) {
              const errorData = await res.json().catch(() => ({}));

@@ -1,4 +1,5 @@
 import { ScanResult } from "../../../entity/ScanResult";
+import { HttpClient } from "../../../../shared/HttpClient";
 
 const API_URL = "http://127.0.0.1:8000";
 
@@ -7,10 +8,7 @@ export class ScanListDataSource {
     const formData = new FormData();
     files.forEach((file) => formData.append("images", file));
 
-    const res = await fetch(`${API_URL}/lists/scan`, {
-      method: "POST",
-      body: formData,
-    });
+    const res = await HttpClient(`${API_URL}/lists/scan`, 'POST', formData);
 
     if (res.status === 409) {
       const data = await res.json();

@@ -9,7 +9,7 @@ import ShoppingListCard from "@/shopping-list/components/ShoppingListCard"
 import ShoppingListActions from "@/shopping-list/components/ShoppingListActions"
 import ProductActions from "@/product/components/ProductActions"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faListCheck, faSearch, faStore, faArrowDownShortWide, faBasketShopping, faDatabase, faAppleWhole, faBoxOpen, faLayerGroup, faClock, faCircleCheck, faCartShopping, faShop, faBuilding, faTruck, faStore as faStoreAlt } from "@fortawesome/free-solid-svg-icons"
+import { faListCheck, faSearch, faStore, faArrowDownShortWide, faBasketShopping, faDatabase, faAppleWhole, faBoxOpen, faLayerGroup, faClock, faCircleCheck, faCartShopping, faShop, faBuilding, faTruck, faStore as faStoreAlt, faCameraRetro, faChartPie, faWandMagicSparkles } from "@fortawesome/free-solid-svg-icons"
 import { useI18n } from "@/i18n/hooks/useI18n"
 import { SHOP_CONFIG } from "@/shopping-list/utils/shopConfig"
 
@@ -321,6 +321,66 @@ export default function HomePage() {
                   <div className="mt-auto w-full max-w-[280px]">
                     <button className="w-full relative overflow-hidden bg-white text-indigo-900 hover:bg-slate-50 p-4 rounded-full transition-all duration-300 shadow-xl active:scale-95 cursor-pointer flex flex-col items-center text-center font-black text-lg" onClick={() => router.push('/products')}>
                       {t("home.explore_btn", { defaultValue: 'Explore DB' })}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Advanced Actions (Scan & Statistics) */}
+          <div className="flex flex-col gap-8 w-full mt-12 bg-slate-900 rounded-[3rem] p-8 md:p-12 shadow-2xl relative overflow-hidden text-white">
+            <div className="absolute top-0 right-0 w-full h-[300px] bg-gradient-to-b from-purple-500/20 to-transparent blur-3xl pointer-events-none"></div>
+            
+            <div className="flex flex-col md:flex-row items-center justify-between pb-6 border-b border-white/10 relative z-10 gap-6">
+              <div className="flex items-center gap-4">
+                <div className="bg-white/10 p-3 rounded-2xl text-purple-400 backdrop-blur-md border border-white/10">
+                  <FontAwesomeIcon icon={faWandMagicSparkles} className="w-8 h-8" />
+                </div>
+                <div>
+                  <h2 className="text-3xl font-black text-white">{t("home.advanced_tools", { defaultValue: 'Advanced Tools' })}</h2>
+                  <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">{t("home.smart_features", { defaultValue: 'Smart Features' })}</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10">
+              {/* Quick Action: Scan Card */}
+              <div className="bg-white/5 backdrop-blur-lg rounded-[2.5rem] p-10 shadow-2xl border border-white/10 flex flex-col items-center text-center gap-6 relative overflow-hidden group w-full h-full hover:bg-white/10 transition-colors duration-500">
+                <div className="absolute -top-12 -right-12 w-40 h-40 bg-purple-500/20 rounded-full transition-transform duration-700 group-hover:scale-[2.5] blur-xl -z-0"></div>
+
+                <div className="relative z-10 w-full flex flex-col flex-grow items-center">
+                  <div className="bg-white/10 p-6 rounded-[2rem] inline-block mb-6 rotate-3 group-hover:rotate-0 transition-all duration-500 border border-white/10">
+                    <FontAwesomeIcon icon={faCameraRetro} className="text-5xl text-purple-400" />
+                  </div>
+                  <h3 className="text-2xl font-black text-white mb-3">{t("nav.scan", { defaultValue: 'Scan' })}</h3>
+                  <p className="text-slate-300 text-sm font-bold mb-10 max-w-[280px] mx-auto opacity-80 flex-grow leading-relaxed">
+                    {t("scan.subtitle", { defaultValue: "Upload a photo of your handwritten shopping list and we'll digitize it automatically." })}
+                  </p>
+                  <div className="mt-auto w-full max-w-[280px]">
+                    <button className="w-full relative overflow-hidden bg-white/10 text-white hover:bg-white/20 p-4 rounded-full transition-all duration-300 shadow-xl active:scale-95 cursor-pointer flex flex-col items-center text-center font-black text-lg border border-white/10" onClick={() => router.push('/scan')}>
+                      {t("home.go_to_scan", { defaultValue: 'Go to Scan' })}
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Quick Action: Stats Card */}
+              <div className="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-[2.5rem] p-10 shadow-lg shadow-indigo-500/20 flex flex-col items-center text-center gap-6 relative overflow-hidden group transition-all duration-500 hover:scale-[1.02] h-full">
+                <div className="absolute -bottom-12 -left-12 w-40 h-40 bg-white/20 rounded-full transition-transform duration-700 group-hover:scale-[3] blur-2xl -z-0"></div>
+
+                <div className="relative z-10 w-full flex flex-col flex-grow items-center">
+                  <div className="bg-white/20 backdrop-blur-md p-6 rounded-[2rem] inline-block mb-6 -rotate-2 group-hover:rotate-0 transition-all duration-500 border border-white/30 text-white shadow-xl">
+                    <FontAwesomeIcon icon={faChartPie} className="text-5xl" />
+                  </div>
+                  <h3 className="text-2xl font-black text-white mb-3">{t("stats.global_stats", { defaultValue: 'Insights & Analytics' })}</h3>
+                  <p className="text-indigo-100 text-sm font-extrabold mb-10 max-w-[280px] mx-auto opacity-80 flex-grow leading-relaxed">
+                    {t("stats.subtitle", { defaultValue: 'Analyze your purchasing habits and database.' })}
+                  </p>
+
+                  <div className="mt-auto w-full max-w-[280px]">
+                    <button className="w-full relative overflow-hidden bg-white text-indigo-900 hover:bg-slate-50 p-4 rounded-full transition-all duration-300 shadow-xl active:scale-95 cursor-pointer flex flex-col items-center text-center font-black text-lg" onClick={() => router.push('/stats')}>
+                      {t("home.go_to_stats", { defaultValue: 'View Stats' })}
                     </button>
                   </div>
                 </div>

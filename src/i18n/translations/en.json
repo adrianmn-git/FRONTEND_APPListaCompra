@@ -49,7 +49,11 @@
     "new_product_desc": "Add foods to your global database for later use.",
     "explore_catalog": "Explore Catalog",
     "explore_desc": "Search and filter all stored products.",
-    "explore_btn": "Explore DB"
+    "explore_btn": "Explore DB",
+    "advanced_tools": "Advanced Tools",
+    "smart_features": "Smart Features",
+    "go_to_scan": "Go to Scan",
+    "go_to_stats": "View Stats"
   },
   "list": {
     "items_count": "Products",
