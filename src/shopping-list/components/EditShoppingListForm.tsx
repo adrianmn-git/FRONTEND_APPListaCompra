@@ -9,6 +9,8 @@ import { faPlus, faXmark, faPenToSquare } from "@fortawesome/free-solid-svg-icon
 import CustomSelect, { CustomSelectOption } from "@/components/ui/CustomSelect"
 import { useI18n } from "@/i18n/hooks/useI18n"
 import { SHOP_CONFIG } from "../utils/shopConfig"
+import { editShoppingListSchema } from "../entity/schemas"
+import { ZodError } from "zod"
 
 type ShopType = ShoppingList['shop']
 
@@ -29,6 +31,8 @@ export default function EditShoppingListForm({ list, className }: EditShoppingLi
   })
   const [isLoading, setIsLoading] = useState(false)
   const [mounted, setMounted] = useState(false)
+  const [formError, setFormError] = useState("")
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
 
   const SHOPS: CustomSelectOption<ShopType>[] = Object.entries(SHOP_CONFIG).map(([key, config]) => ({
     value: key as ShopType,
@@ -44,7 +48,28 @@ export default function EditShoppingListForm({ list, className }: EditShoppingLi
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!formData.name.trim()) return
+    setFormError("")
+    setFieldErrors({})
+
+    try {
+      editShoppingListSchema.parse({
+        name: formData.name.trim(),
+        shop: formData.shop,
+        description: formData.description.trim()
+      })
+    } catch (err) {
+      if (err instanceof ZodError) {
+        const errors: Record<string, string> = {}
+        err.issues.forEach((issue) => {
+          const field = issue.path[0] as string
+          if (!errors[field]) errors[field] = issue.message
+        })
+        setFieldErrors(errors)
+        const firstKey = err.issues[0].message
+        setFormError(t(`validation.${firstKey}`, { defaultValue: firstKey }))
+        return
+      }
+    }
 
     setIsLoading(true)
     try {
@@ -58,6 +83,9 @@ export default function EditShoppingListForm({ list, className }: EditShoppingLi
       setIsLoading(false)
     }
   }
+
+  const inputClass = (field: string) =>
+    `w-full h-11 bg-slate-50 border-2 ${fieldErrors[field] ? 'border-red-300 ring-4 ring-red-500/10' : 'border-slate-100'} rounded-xl px-6 text-slate-800 font-bold placeholder:text-slate-400 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-400 transition-all`
 
   return (
     <>
@@ -92,16 +120,18 @@ export default function EditShoppingListForm({ list, className }: EditShoppingLi
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
+              {formError && <div className="p-3 bg-red-50 border border-red-200 text-red-600 rounded-xl text-sm font-semibold">{formError}</div>}
+
               <div className="flex flex-col gap-1.5">
                 <label className="text-[10px] font-black uppercase text-slate-400 ml-1 tracking-wider">{t("modals.name_label", { defaultValue: 'Name' })}</label>
                 <input
                   type="text"
                   value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  onChange={(e) => { setFormData({ ...formData, name: e.target.value }); setFieldErrors(prev => ({ ...prev, name: "" })) }}
                   placeholder={t("modals.name_placeholder", { defaultValue: 'Ex: Weekly Shopping' })}
-                  required
-                  className="w-full h-11 bg-slate-50 border-2 border-slate-100 rounded-xl px-6 text-slate-800 font-bold placeholder:text-slate-400 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-400 transition-all"
+                  className={inputClass("name")}
                 />
+                {fieldErrors.name && <p className="text-xs font-bold text-red-500 ml-1">{t(`validation.${fieldErrors.name}`, { defaultValue: fieldErrors.name })}</p>}
               </div>
 
                 <CustomSelect
@@ -115,14 +145,15 @@ export default function EditShoppingListForm({ list, className }: EditShoppingLi
                 <label className="text-[10px] font-black uppercase text-slate-400 ml-1 tracking-wider">{t("modals.description_label", { defaultValue: 'Description' })}</label>
                 <textarea
                   value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  onChange={(e) => { setFormData({ ...formData, description: e.target.value }); setFieldErrors(prev => ({ ...prev, description: "" })) }}
                   placeholder={t("modals.description_placeholder", { defaultValue: 'Add a description...' })}
                   rows={3}
                   maxLength={500}
-                  className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-6 py-3 text-slate-600 font-bold placeholder:text-slate-400 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-400 transition-all resize-none min-h-[80px]"
+                  className={`w-full bg-slate-50 border-2 ${fieldErrors.description ? 'border-red-300 ring-4 ring-red-500/10' : 'border-slate-100'} rounded-xl px-6 py-3 text-slate-600 font-bold placeholder:text-slate-400 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-400 transition-all resize-none min-h-[80px]`}
                 />
-                <div className="flex justify-end pr-2">
-                  <span className={`text-[10px] font-black uppercase ${formData.description.length >= 500 ? 'text-red-500' : 'text-slate-400'}`}>
+                <div className="flex justify-between pr-2">
+                  {fieldErrors.description && <p className="text-xs font-bold text-red-500 ml-1">{t(`validation.${fieldErrors.description}`, { defaultValue: fieldErrors.description })}</p>}
+                  <span className={`text-[10px] font-black uppercase ml-auto ${formData.description.length >= 500 ? 'text-red-500' : 'text-slate-400'}`}>
                     {formData.description.length} / 500
                   </span>
                 </div>
@@ -138,7 +169,7 @@ export default function EditShoppingListForm({ list, className }: EditShoppingLi
                 </button>
                 <button
                   type="submit"
-                  disabled={isLoading || !formData.name.trim()}
+                  disabled={isLoading}
                   className="flex-[2] bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-2xl shadow-lg shadow-indigo-100 hover:shadow-indigo-200 transition-all duration-200 active:scale-[0.98] cursor-pointer disabled:opacity-50"
                 >
                   {isLoading ? t("common.loading", { defaultValue: 'Loading...' }) : t("common.save", { defaultValue: 'Save' })}

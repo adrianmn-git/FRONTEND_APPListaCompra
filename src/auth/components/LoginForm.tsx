@@ -5,6 +5,8 @@ import { useAuth } from "../hooks/useAuth";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { useI18n } from "../../i18n/hooks/useI18n";
+import { loginSchema } from "../entity/schemas";
+import { ZodError } from "zod";
 
 export const LoginForm = () => {
     const { login } = useAuth();
@@ -15,27 +17,42 @@ export const LoginForm = () => {
     });
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState("");
+    const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
     const [loading, setLoading] = useState(false);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError("");
-        
-        if (!formData.email || !formData.password) {
-            setError(t("auth.errors.fill_fields", { defaultValue: "Por favor, rellena todos los campos" }));
-            return;
+        setFieldErrors({});
+
+        try {
+            loginSchema.parse(formData);
+        } catch (err) {
+            if (err instanceof ZodError) {
+                const errors: Record<string, string> = {};
+                err.issues.forEach((issue) => {
+                    const field = issue.path[0] as string;
+                    errors[field] = issue.message;
+                });
+                setFieldErrors(errors);
+                const firstKey = err.issues[0].message;
+                setError(t(`validation.${firstKey}`, { defaultValue: firstKey }));
+                return;
+            }
         }
 
         setLoading(true);
         try {
             await login({ email: formData.email, password: formData.password });
-            // The AuthContext router.push will handle redirect or we let the page handle it
         } catch (err: any) {
             setError(err.message || t("auth.errors.login_fail", { defaultValue: "Error al iniciar sesión" }));
         } finally {
             setLoading(false);
         }
     };
+
+    const inputClass = (field: string) =>
+        `w-full bg-white border-2 ${fieldErrors[field] ? 'border-red-300 ring-4 ring-red-500/10' : 'border-slate-200'} text-slate-800 text-sm rounded-2xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 block p-4 transition-all outline-none font-medium placeholder-slate-400 shadow-sm`;
 
     return (
         <form onSubmit={handleSubmit} className="flex flex-col gap-5 mt-8">
@@ -47,10 +64,11 @@ export const LoginForm = () => {
                     id="email"
                     type="email"
                     value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="w-full bg-white border-2 border-slate-200 text-slate-800 text-sm rounded-2xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 block p-4 transition-all outline-none font-medium placeholder-slate-400 shadow-sm"
+                    onChange={(e) => { setFormData({ ...formData, email: e.target.value }); setFieldErrors(prev => ({ ...prev, email: "" })); }}
+                    className={inputClass("email")}
                     placeholder={t("auth.email_placeholder", { defaultValue: "tu@email.com" })}
                 />
+                {fieldErrors.email && <p className="text-xs font-bold text-red-500 ml-1">{t(`validation.${fieldErrors.email}`, { defaultValue: fieldErrors.email })}</p>}
             </div>
 
             <div className="flex flex-col gap-2 relative">
@@ -60,8 +78,8 @@ export const LoginForm = () => {
                         id="password"
                         type={showPassword ? "text" : "password"}
                         value={formData.password}
-                        onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                        className="w-full bg-white border-2 border-slate-200 text-slate-800 text-sm rounded-2xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 block p-4 pr-12 transition-all outline-none font-medium placeholder-slate-400 shadow-sm"
+                        onChange={(e) => { setFormData({ ...formData, password: e.target.value }); setFieldErrors(prev => ({ ...prev, password: "" })); }}
+                        className={`${inputClass("password")} pr-12`}
                         placeholder={t("auth.password_placeholder", { defaultValue: "••••••••" })}
                     />
                     <button
@@ -72,6 +90,7 @@ export const LoginForm = () => {
                         <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
                     </button>
                 </div>
+                {fieldErrors.password && <p className="text-xs font-bold text-red-500 ml-1">{t(`validation.${fieldErrors.password}`, { defaultValue: fieldErrors.password })}</p>}
             </div>
 
             <button

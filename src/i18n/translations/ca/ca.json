@@ -203,7 +203,10 @@
     "registering": "Registrant...",
     "new_password": "Nova Contrasenya",
     "confirm_new_password": "Confirmar Nova Contrasenya",
-    "password_rule": "Ha de tenir més de 8 caràcters",
+    "password_rule_length": "Ha de tenir més de 8 caràcters",
+    "password_rule_uppercase": "Mínim una majúscula",
+    "password_rule_number": "Mínim un número",
+    "password_rule_symbol": "Mínim un símbol (_, -, !, ?...)",
     "leave_blank": "Deixa els següents camps en blanc si no vols canviar la teva contrasenya actual.",
     "updating": "Actualitzant...",
     "save_changes": "Desar Canvis",
@@ -211,6 +214,9 @@
       "fill_fields": "Si us plau, omple tots els camps",
       "password_length": "La contrasenya ha de tenir més de 8 caràcters",
       "new_password_length": "La nova contrasenya ha de tenir més de 8 caràcters",
+      "password_uppercase": "La contrasenya ha de tenir almenys una majúscula",
+      "password_number": "La contrasenya ha de tenir almenys un número",
+      "password_symbol": "La contrasenya ha de tenir almenys un símbol",
       "passwords_mismatch": "Les contrasenyes no coincideixen",
       "login_fail": "Error a l'iniciar sessió",
       "register_fail": "Error al registrar-se",
@@ -263,5 +269,21 @@
     "products_detected": "Productes detectats",
     "view_list": "Veure llista",
     "scan_another": "Escanejar altra llista"
+  },
+  "validation": {
+    "required_field": "Aquest camp és obligatori",
+    "invalid_email": "Introdueix una adreça de correu vàlida",
+    "name_too_long": "El nom no pot superar {{max}} caràcters",
+    "description_too_long": "La descripció no pot superar {{max}} caràcters",
+    "price_positive": "El preu ha de ser un número positiu",
+    "price_max": "El preu no pot superar {{max}}€",
+    "quantity_min": "La quantitat ha de ser almenys 1",
+    "select_list": "Selecciona almenys una llista",
+    "select_product": "Selecciona un producte",
+    "password_length": "La contrasenya ha de tenir més de 8 caràcters",
+    "password_uppercase": "La contrasenya ha de tenir almenys una majúscula",
+    "password_number": "La contrasenya ha de tenir almenys un número",
+    "password_symbol": "La contrasenya ha de tenir almenys un símbol",
+    "passwords_mismatch": "Les contrasenyes no coincideixen"
   }
 }

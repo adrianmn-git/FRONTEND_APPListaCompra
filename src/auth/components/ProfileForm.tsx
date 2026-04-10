@@ -6,6 +6,8 @@ import { UpdateUserData } from "../entity/User";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { useI18n } from "../../i18n/hooks/useI18n";
+import { profileSchema } from "../entity/schemas";
+import { ZodError } from "zod";
 
 export const ProfileForm = () => {
     const { user, updateProfile } = useAuth();
@@ -19,6 +21,7 @@ export const ProfileForm = () => {
     });
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
+    const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
     const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -36,21 +39,29 @@ export const ProfileForm = () => {
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
+        setFieldErrors(prev => ({ ...prev, [e.target.name]: "" }));
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError("");
         setSuccess("");
+        setFieldErrors({});
 
-        if (formData.password && formData.password.length <= 8) {
-            setError(t("auth.errors.new_password_length", { defaultValue: "La nueva contraseña debe tener más de 8 caracteres" }));
-            return;
-        }
-
-        if (formData.password && formData.password !== formData.confirmPassword) {
-            setError(t("auth.errors.passwords_mismatch", { defaultValue: "Las contraseñas no coinciden" }));
-            return;
+        try {
+            profileSchema.parse(formData);
+        } catch (err) {
+            if (err instanceof ZodError) {
+                const errors: Record<string, string> = {};
+                err.issues.forEach((issue) => {
+                    const field = issue.path[0] as string;
+                    if (!errors[field]) errors[field] = issue.message;
+                });
+                setFieldErrors(errors);
+                const firstKey = err.issues[0].message;
+                setError(t(`validation.${firstKey}`, { defaultValue: firstKey }));
+                return;
+            }
         }
 
         setLoading(true);
@@ -77,6 +88,9 @@ export const ProfileForm = () => {
 
     if (!user) return null;
 
+    const inputClass = (field: string) =>
+        `w-full bg-slate-50 border-2 ${fieldErrors[field] ? 'border-red-300 ring-4 ring-red-500/10' : 'border-slate-200'} text-slate-800 text-sm rounded-2xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 block p-3.5 transition-all outline-none font-medium shadow-sm`;
+
     return (
         <form onSubmit={handleSubmit} className="flex flex-col gap-5">
             {error && <div className="p-4 bg-red-50 border border-red-200 text-red-600 rounded-2xl text-sm font-semibold shadow-sm">{error}</div>}
@@ -91,8 +105,9 @@ export const ProfileForm = () => {
                         type="text"
                         value={formData.first_name}
                         onChange={handleChange}
-                        className="w-full bg-slate-50 border-2 border-slate-200 text-slate-800 text-sm rounded-2xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 block p-3.5 transition-all outline-none font-medium shadow-sm"
+                        className={inputClass("first_name")}
                     />
+                    {fieldErrors.first_name && <p className="text-xs font-bold text-red-500 ml-1">{t(`validation.${fieldErrors.first_name}`, { defaultValue: fieldErrors.first_name })}</p>}
                 </div>
                 <div className="flex flex-col gap-2">
                     <label htmlFor="last_name" className="text-xs font-bold text-slate-700 ml-1 uppercase tracking-wider">{t("auth.last_name", { defaultValue: "Apellidos" })}</label>
@@ -102,8 +117,9 @@ export const ProfileForm = () => {
                         type="text"
                         value={formData.last_name}
                         onChange={handleChange}
-                        className="w-full bg-slate-50 border-2 border-slate-200 text-slate-800 text-sm rounded-2xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 block p-3.5 transition-all outline-none font-medium shadow-sm"
+                        className={inputClass("last_name")}
                     />
+                    {fieldErrors.last_name && <p className="text-xs font-bold text-red-500 ml-1">{t(`validation.${fieldErrors.last_name}`, { defaultValue: fieldErrors.last_name })}</p>}
                 </div>
             </div>
 
@@ -115,8 +131,9 @@ export const ProfileForm = () => {
                     type="email"
                     value={formData.email}
                     onChange={handleChange}
-                    className="w-full bg-slate-50 border-2 border-slate-200 text-slate-800 text-sm rounded-2xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 block p-3.5 transition-all outline-none font-medium shadow-sm"
+                    className={inputClass("email")}
                 />
+                {fieldErrors.email && <p className="text-xs font-bold text-red-500 ml-1">{t(`validation.${fieldErrors.email}`, { defaultValue: fieldErrors.email })}</p>}
             </div>
 
             <hr className="my-6 border-slate-200" />
@@ -134,7 +151,7 @@ export const ProfileForm = () => {
                         type={showPassword ? "text" : "password"}
                         value={formData.password}
                         onChange={handleChange}
-                        className="w-full bg-slate-50 border-2 border-slate-200 text-slate-800 text-sm rounded-2xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 block p-3.5 pr-12 transition-all outline-none font-medium shadow-sm placeholder-slate-400"
+                        className={`${inputClass("password")} pr-12 placeholder-slate-400`}
                         placeholder="••••••••"
                     />
                     <button
@@ -145,8 +162,20 @@ export const ProfileForm = () => {
                         <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
                     </button>
                 </div>
-                <div className={`text-xs ml-1 font-bold transition-colors ${(formData.password ?? "").length === 0 ? 'hidden' : (formData.password ?? "").length > 8 ? 'text-emerald-600' : 'text-slate-400'}`}>
-                    {(formData.password ?? "").length > 8 ? '✓' : '•'} {t("auth.password_rule", { defaultValue: "Debe tener más de 8 caracteres" })}
+                {fieldErrors.password && <p className="text-xs font-bold text-red-500 ml-1">{t(`validation.${fieldErrors.password}`, { defaultValue: fieldErrors.password })}</p>}
+                <div className={`flex flex-col gap-1 mt-1 ${(formData.password ?? "").length === 0 ? 'hidden' : ''}`}>
+                    <p className={`text-xs ml-1 font-bold transition-colors ${(formData.password ?? "").length > 8 ? 'text-emerald-600' : 'text-slate-400'}`}>
+                        {(formData.password ?? "").length > 8 ? '✓' : '•'} {t("auth.password_rule_length", { defaultValue: "Debe tener más de 8 caracteres" })}
+                    </p>
+                    <p className={`text-xs ml-1 font-bold transition-colors ${/\p{Lu}/u.test(formData.password ?? "") ? 'text-emerald-600' : 'text-slate-400'}`}>
+                        {/\p{Lu}/u.test(formData.password ?? "") ? '✓' : '•'} {t("auth.password_rule_uppercase", { defaultValue: "Mínimo una mayúscula" })}
+                    </p>
+                    <p className={`text-xs ml-1 font-bold transition-colors ${/\d/.test(formData.password ?? "") ? 'text-emerald-600' : 'text-slate-400'}`}>
+                        {/\d/.test(formData.password ?? "") ? '✓' : '•'} {t("auth.password_rule_number", { defaultValue: "Mínimo un número" })}
+                    </p>
+                    <p className={`text-xs ml-1 font-bold transition-colors ${/[^\p{L}\p{N}\s]/u.test(formData.password ?? "") ? 'text-emerald-600' : 'text-slate-400'}`}>
+                        {/[^\p{L}\p{N}\s]/u.test(formData.password ?? "") ? '✓' : '•'} {t("auth.password_rule_symbol", { defaultValue: "Mínimo un símbolo (_, -, !, ?...)" })}
+                    </p>
                 </div>
             </div>
             
@@ -159,7 +188,7 @@ export const ProfileForm = () => {
                         type={showConfirmPassword ? "text" : "password"}
                         value={formData.confirmPassword}
                         onChange={handleChange}
-                        className="w-full bg-slate-50 border-2 border-slate-200 text-slate-800 text-sm rounded-2xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 block p-3.5 pr-12 transition-all outline-none font-medium shadow-sm placeholder-slate-400"
+                        className={`${inputClass("confirmPassword")} pr-12 placeholder-slate-400`}
                         placeholder="••••••••"
                     />
                     <button
@@ -170,12 +199,21 @@ export const ProfileForm = () => {
                         <FontAwesomeIcon icon={showConfirmPassword ? faEyeSlash : faEye} />
                     </button>
                 </div>
+                {fieldErrors.confirmPassword && <p className="text-xs font-bold text-red-500 ml-1">{t(`validation.${fieldErrors.confirmPassword}`, { defaultValue: fieldErrors.confirmPassword })}</p>}
             </div>
 
             <div className="mt-4 flex justify-end">
                 <button
                     type="submit"
-                    disabled={loading || ((formData.password ?? "").length > 0 && (formData.password ?? "").length <= 8)}
+                    disabled={
+                        loading || 
+                        ((formData.password ?? "").length > 0 && (
+                            (formData.password ?? "").length <= 8 ||
+                            !/\p{Lu}/u.test(formData.password ?? "") ||
+                            !/\d/.test(formData.password ?? "") ||
+                            !/[^\p{L}\p{N}\s]/u.test(formData.password ?? "")
+                        ))
+                    }
                     className="w-full sm:w-auto text-white bg-indigo-600 hover:bg-indigo-700 focus:ring-4 focus:outline-none focus:ring-indigo-300 font-bold rounded-2xl text-base px-8 py-3.5 text-center transition-all duration-300 shadow-lg shadow-indigo-600/30 disabled:opacity-50 hover:-translate-y-1 active:translate-y-0"
                 >
                     {loading ? t("auth.updating", { defaultValue: "Actualizando..." }) : t("auth.save_changes", { defaultValue: "Guardar Cambios" })}

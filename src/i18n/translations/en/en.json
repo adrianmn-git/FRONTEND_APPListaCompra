@@ -203,7 +203,10 @@
     "registering": "Registering...",
     "new_password": "New Password",
     "confirm_new_password": "Confirm New Password",
-    "password_rule": "Must be longer than 8 characters",
+    "password_rule_length": "Must be longer than 8 characters",
+    "password_rule_uppercase": "Minimum one uppercase",
+    "password_rule_number": "Minimum one number",
+    "password_rule_symbol": "Minimum one symbol (_, -, !, ?...)",
     "leave_blank": "Leave the following fields blank if you do not wish to change your current password.",
     "updating": "Updating...",
     "save_changes": "Save Changes",
@@ -211,6 +214,9 @@
       "fill_fields": "Please fill in all fields",
       "password_length": "Password must be more than 8 characters",
       "new_password_length": "New password must be more than 8 characters",
+      "password_uppercase": "Password must have at least one uppercase letter",
+      "password_number": "Password must have at least one number",
+      "password_symbol": "Password must have at least one symbol",
       "passwords_mismatch": "Passwords do not match",
       "login_fail": "Error logging in",
       "register_fail": "Error registering",
@@ -263,5 +269,21 @@
     "products_detected": "Products detected",
     "view_list": "View list",
     "scan_another": "Scan another list"
+  },
+  "validation": {
+    "required_field": "This field is required",
+    "invalid_email": "Please enter a valid email address",
+    "name_too_long": "Name must not exceed {{max}} characters",
+    "description_too_long": "Description must not exceed {{max}} characters",
+    "price_positive": "Price must be a positive number",
+    "price_max": "Price must not exceed €{{max}}",
+    "quantity_min": "Quantity must be at least 1",
+    "select_list": "Select at least one list",
+    "select_product": "Please select a product",
+    "password_length": "Password must be more than 8 characters",
+    "password_uppercase": "Password must have at least one uppercase letter",
+    "password_number": "Password must have at least one number",
+    "password_symbol": "Password must have at least one symbol",
+    "passwords_mismatch": "Passwords do not match"
   }
 }

@@ -11,6 +11,8 @@ import { faXmark, faScaleBalanced, faWeightHanging, faFlask, faBottleDroplet, fa
 import CustomSelect, { CustomSelectOption } from "@/components/ui/CustomSelect"
 import { useI18n } from "@/i18n/hooks/useI18n"
 import { useNotification } from "@/notifications/hooks/useNotification"
+import { addProductToListSchema } from "../entity/schemas"
+import { ZodError } from "zod"
 
 const UNIT_OPTIONS: CustomSelectOption<UnitType>[] = [
   { value: 'unit', label: 'Unit', icon: faBox, color: 'bg-slate-50 text-slate-600 border-slate-100' },
@@ -37,33 +39,50 @@ export default function AddProductToListModal({ product, onClose }: Props) {
   const [unit, setUnit] = useState<UnitType>("unit")
   const [isLoading, setIsLoading] = useState(false)
   const [mounted, setMounted] = useState(false)
+  const [formError, setFormError] = useState("")
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
 
-  // Sync animation open state with prop changes
   useEffect(() => {
     if (product) {
       setMounted(true)
       setIsLoading(false)
-      getLists() // ensure we have updated lists
-      // Small timeout for intro animation
+      getLists()
       setTimeout(() => setIsOpen(true), 10)
     } else {
       setIsOpen(false)
     }
   }, [product, getLists])
 
-  // Handle exiting animation cleanly
   const handleClose = () => {
     setIsOpen(false)
-    setTimeout(() => onClose(), 300) // matches duration of fade out
+    setTimeout(() => onClose(), 300)
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!product || selectedListIds.length === 0) return
+    setFormError("")
+    setFieldErrors({})
+
+    if (!product) return
+
+    try {
+      addProductToListSchema.parse({ selectedListIds, quantity, unit })
+    } catch (err) {
+      if (err instanceof ZodError) {
+        const errors: Record<string, string> = {}
+        err.issues.forEach((issue) => {
+          const field = issue.path[0] as string
+          if (!errors[field]) errors[field] = issue.message
+        })
+        setFieldErrors(errors)
+        const firstKey = err.issues[0].message
+        setFormError(t(`validation.${firstKey}`, { defaultValue: firstKey }))
+        return
+      }
+    }
 
     setIsLoading(true)
     try {
-      // Add item to all selected lists concurrently
       await Promise.all(
         selectedListIds.map(listId => 
           addItem({ shopping_list: listId, product: product.id, quantity, unit })
@@ -79,13 +98,13 @@ export default function AddProductToListModal({ product, onClose }: Props) {
 
   if (!mounted || (!isOpen && !product)) return null
 
-  // Ensure active lists exist
   const activeLists = lists?.filter(l => !l.completed) || [];
 
   const toggleList = (id: number) => {
     setSelectedListIds(prev => 
       prev.includes(id) ? prev.filter(lId => lId !== id) : [...prev, id]
     )
+    setFieldErrors(prev => ({ ...prev, selectedListIds: "" }))
   }
 
   return createPortal(
@@ -111,6 +130,8 @@ export default function AddProductToListModal({ product, onClose }: Props) {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
+          {formError && <div className="p-3 bg-red-50 border border-red-200 text-red-600 rounded-xl text-sm font-semibold">{formError}</div>}
+
           <div className="flex flex-col gap-2">
             <label className="text-[10px] font-black uppercase text-slate-400 ml-1 tracking-wider">
               {t("products.select_list", { defaultValue: 'Select active lists' })}
@@ -126,7 +147,7 @@ export default function AddProductToListModal({ product, onClose }: Props) {
                     className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border-2 transition-all duration-200 font-bold text-sm cursor-pointer ${
                       isSelected 
                         ? 'border-indigo-600 bg-indigo-50 text-indigo-700 shadow-sm'
-                        : 'border-slate-100 bg-white text-slate-600 hover:border-slate-300'
+                        : `${fieldErrors.selectedListIds ? 'border-red-200' : 'border-slate-100'} bg-white text-slate-600 hover:border-slate-300`
                     }`}
                   >
                     <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center transition-colors ${isSelected ? 'border-indigo-600 bg-indigo-600' : 'border-slate-300'}`}>
@@ -137,6 +158,7 @@ export default function AddProductToListModal({ product, onClose }: Props) {
                 )
               })}
             </div>
+            {fieldErrors.selectedListIds && <p className="text-xs font-bold text-red-500 ml-1">{t(`validation.${fieldErrors.selectedListIds}`, { defaultValue: fieldErrors.selectedListIds })}</p>}
           </div>
 
           <div className="grid grid-cols-2 gap-4">
@@ -147,8 +169,9 @@ export default function AddProductToListModal({ product, onClose }: Props) {
                 min={1}
                 value={quantity}
                 onChange={(e) => setQuantity(Math.max(1, Number(e.target.value)))}
-                className="w-full h-11 bg-slate-50 border-2 border-slate-100 rounded-xl px-5 text-slate-800 font-bold focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-400 transition-all"
+                className={`w-full h-11 bg-slate-50 border-2 ${fieldErrors.quantity ? 'border-red-300 ring-4 ring-red-500/10' : 'border-slate-100'} rounded-xl px-5 text-slate-800 font-bold focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-400 transition-all`}
               />
+              {fieldErrors.quantity && <p className="text-xs font-bold text-red-500 ml-1">{t(`validation.${fieldErrors.quantity}`, { defaultValue: fieldErrors.quantity })}</p>}
             </div>
 
             <CustomSelect
@@ -178,7 +201,7 @@ export default function AddProductToListModal({ product, onClose }: Props) {
             </button>
             <button
               type="submit"
-              disabled={isLoading || selectedListIds.length === 0 || activeLists.length === 0}
+              disabled={isLoading || activeLists.length === 0}
               className="flex-[2] bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-2xl shadow-lg shadow-indigo-100 hover:shadow-indigo-200 transition-all duration-200 active:scale-[0.98] cursor-pointer disabled:opacity-50"
             >
               {isLoading ? t("common.adding", { defaultValue: 'Adding...' }) : t("common.add", { defaultValue: 'Add' })}

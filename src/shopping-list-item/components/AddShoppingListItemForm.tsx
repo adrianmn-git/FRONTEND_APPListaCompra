@@ -6,9 +6,11 @@ import { useShoppingListItems } from "../hooks/useShoppingListItems"
 import { useProduct } from "@/product/hooks/useProduct"
 import { UnitType } from "../entity/ShoppingListItem"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faPlus, faXmark, faChevronDown, faScaleBalanced, faWeightHanging, faFlask, faJar, faBottleDroplet, faBox, faBasketShopping } from "@fortawesome/free-solid-svg-icons"
+import { faPlus, faXmark, faChevronDown, faScaleBalanced, faWeightHanging, faFlask, faBottleDroplet, faBox, faBasketShopping } from "@fortawesome/free-solid-svg-icons"
 import CustomSelect, { CustomSelectOption } from "@/components/ui/CustomSelect"
 import { useI18n } from "@/i18n/hooks/useI18n"
+import { addShoppingListItemSchema } from "../entity/schemas"
+import { ZodError } from "zod"
 
 const UNIT_OPTIONS: CustomSelectOption<UnitType>[] = [
   { value: 'unit', label: 'Unit', icon: faBox, color: 'bg-slate-50 text-slate-600 border-slate-100' },
@@ -35,6 +37,8 @@ export default function AddShoppingListItemForm({ listId }: Props) {
   })
   const [isLoading, setIsLoading] = useState(false)
   const [mounted, setMounted] = useState(false)
+  const [formError, setFormError] = useState("")
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
 
   useEffect(() => {
     setMounted(true)
@@ -47,7 +51,28 @@ export default function AddShoppingListItemForm({ listId }: Props) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (formData.productId === "") return
+    setFormError("")
+    setFieldErrors({})
+
+    try {
+      addShoppingListItemSchema.parse({
+        productId: formData.productId === "" ? undefined : formData.productId,
+        quantity: formData.quantity,
+        unit: formData.unit
+      })
+    } catch (err) {
+      if (err instanceof ZodError) {
+        const errors: Record<string, string> = {}
+        err.issues.forEach((issue) => {
+          const field = issue.path[0] as string
+          if (!errors[field]) errors[field] = issue.message
+        })
+        setFieldErrors(errors)
+        const firstKey = err.issues[0].message
+        setFormError(t(`validation.${firstKey}`, { defaultValue: firstKey }))
+        return
+      }
+    }
 
     setIsLoading(true)
     try {
@@ -89,6 +114,8 @@ export default function AddShoppingListItemForm({ listId }: Props) {
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
+              {formError && <div className="p-3 bg-red-50 border border-red-200 text-red-600 rounded-xl text-sm font-semibold">{formError}</div>}
+
               <CustomSelect
                 label={t("modals.product_label", { defaultValue: 'Product' })}
                 value={formData.productId}
@@ -98,8 +125,9 @@ export default function AddShoppingListItemForm({ listId }: Props) {
                   label: p.name,
                   icon: faBasketShopping
                 }))}
-                onChange={(val) => setFormData({ ...formData, productId: val as number })}
+                onChange={(val) => { setFormData({ ...formData, productId: val as number }); setFieldErrors(prev => ({ ...prev, productId: "" })) }}
               />
+              {fieldErrors.productId && <p className="text-xs font-bold text-red-500 ml-1 -mt-4">{t(`validation.${fieldErrors.productId}`, { defaultValue: fieldErrors.productId })}</p>}
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex flex-col gap-1.5">
@@ -109,8 +137,9 @@ export default function AddShoppingListItemForm({ listId }: Props) {
                     min={1}
                     value={formData.quantity}
                     onChange={(e) => setFormData({ ...formData, quantity: Math.max(1, Number(e.target.value)) })}
-                    className="w-full h-11 bg-slate-50 border-2 border-slate-100 rounded-xl px-5 text-slate-800 font-bold focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-400 transition-all"
+                    className={`w-full h-11 bg-slate-50 border-2 ${fieldErrors.quantity ? 'border-red-300 ring-4 ring-red-500/10' : 'border-slate-100'} rounded-xl px-5 text-slate-800 font-bold focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-400 transition-all`}
                   />
+                  {fieldErrors.quantity && <p className="text-xs font-bold text-red-500 ml-1">{t(`validation.${fieldErrors.quantity}`, { defaultValue: fieldErrors.quantity })}</p>}
                 </div>
 
                 <CustomSelect
@@ -134,7 +163,7 @@ export default function AddShoppingListItemForm({ listId }: Props) {
                 </button>
                 <button
                   type="submit"
-                  disabled={isLoading || formData.productId === ""}
+                  disabled={isLoading}
                   className="flex-[2] bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-2xl shadow-lg shadow-indigo-100 hover:shadow-indigo-200 transition-all duration-200 active:scale-[0.98] cursor-pointer disabled:opacity-50"
                 >
                   {isLoading ? t("common.adding", { defaultValue: 'Adding...' }) : t("common.add", { defaultValue: 'Add' })}

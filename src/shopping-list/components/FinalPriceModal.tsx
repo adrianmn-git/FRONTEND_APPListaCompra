@@ -4,6 +4,9 @@ import { useState, useEffect } from "react"
 import { createPortal } from "react-dom"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faXmark, faEuroSign, faCheckCircle } from "@fortawesome/free-solid-svg-icons"
+import { useI18n } from "@/i18n/hooks/useI18n"
+import { finalPriceSchema } from "../entity/schemas"
+import { ZodError } from "zod"
 
 interface FinalPriceModalProps {
   isOpen: boolean
@@ -12,13 +15,12 @@ interface FinalPriceModalProps {
   listName: string
 }
 
-import { useI18n } from "@/i18n/hooks/useI18n"
-
 export default function FinalPriceModal({ isOpen, onClose, onConfirm, listName }: FinalPriceModalProps) {
   const { t } = useI18n()
   const [price, setPrice] = useState<string>("")
   const [isLoading, setIsLoading] = useState(false)
   const [mounted, setMounted] = useState(false)
+  const [formError, setFormError] = useState("")
 
   useEffect(() => {
     setMounted(true)
@@ -28,8 +30,19 @@ export default function FinalPriceModal({ isOpen, onClose, onConfirm, listName }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setFormError("")
+
     const numPrice = parseFloat(price)
-    if (isNaN(numPrice)) return
+
+    try {
+      finalPriceSchema.parse({ price: numPrice })
+    } catch (err) {
+      if (err instanceof ZodError) {
+        const firstKey = err.issues[0].message
+        setFormError(t(`validation.${firstKey}`, { defaultValue: firstKey }))
+        return
+      }
+    }
 
     setIsLoading(true)
     try {
@@ -66,6 +79,8 @@ export default function FinalPriceModal({ isOpen, onClose, onConfirm, listName }
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-8">
+            {formError && <div className="p-3 bg-red-50 border border-red-200 text-red-600 rounded-xl text-sm font-semibold">{formError}</div>}
+
             <div className="relative flex flex-col items-center">
               <div className="relative w-full">
                 <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none">
@@ -76,10 +91,9 @@ export default function FinalPriceModal({ isOpen, onClose, onConfirm, listName }
                   step="0.01"
                   autoFocus
                   value={price}
-                  onChange={(e) => setPrice(e.target.value)}
+                  onChange={(e) => { setPrice(e.target.value); setFormError("") }}
                   placeholder="0.00"
-                  required
-                  className="w-full h-12 bg-white border-2 border-slate-100 rounded-xl pl-12 pr-4 text-slate-800 font-bold focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-400 transition-all text-lg appearance-none"
+                  className={`w-full h-12 bg-white border-2 ${formError ? 'border-red-300 ring-4 ring-red-500/10' : 'border-slate-100'} rounded-xl pl-12 pr-4 text-slate-800 font-bold focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-400 transition-all text-lg appearance-none`}
                 />
               </div>
             </div>

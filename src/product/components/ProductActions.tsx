@@ -9,6 +9,8 @@ import { ProductCategory } from '../entity/Product'
 import CustomSelect, { CustomSelectOption } from "@/components/ui/CustomSelect"
 import { useI18n } from "@/i18n/hooks/useI18n"
 import { CATEGORY_CONFIG } from "../utils/categoryConfig"
+import { createProductSchema } from "../entity/schemas"
+import { ZodError } from "zod"
 
 interface Props {
   variant?: 'vertical' | 'horizontal'
@@ -23,6 +25,7 @@ export default function ProductActions({ variant = 'vertical' }: Props) {
   const [category, setCategory] = useState<ProductCategory>('fruit')
   const [isLoading, setIsLoading] = useState(false)
   const [errorLocal, setErrorLocal] = useState<string | null>(null)
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
   const [mounted, setMounted] = useState(false)
 
   const CATEGORIES: CustomSelectOption<ProductCategory>[] = Object.entries(CATEGORY_CONFIG).map(([key, config]) => ({
@@ -38,10 +41,26 @@ export default function ProductActions({ variant = 'vertical' }: Props) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!name.trim()) return
+    setErrorLocal(null)
+    setFieldErrors({})
+
+    try {
+      createProductSchema.parse({ name: name.trim(), category })
+    } catch (err) {
+      if (err instanceof ZodError) {
+        const errors: Record<string, string> = {}
+        err.issues.forEach((issue) => {
+          const field = issue.path[0] as string
+          if (!errors[field]) errors[field] = issue.message
+        })
+        setFieldErrors(errors)
+        const firstKey = err.issues[0].message
+        setErrorLocal(t(`validation.${firstKey}`, { defaultValue: firstKey }))
+        return
+      }
+    }
 
     setIsLoading(true)
-    setErrorLocal(null)
     try {
       await addProduct({
         name: name.trim(),
@@ -58,7 +77,7 @@ export default function ProductActions({ variant = 'vertical' }: Props) {
 
   return (
     <>
-      {/* Trigger Button - Dynamic Variant */}
+      {/* Trigger Button */}
       {variant === 'vertical' ? (
         <button
           onClick={() => setIsOpen(true)}
@@ -79,7 +98,7 @@ export default function ProductActions({ variant = 'vertical' }: Props) {
         </button>
       )}
 
-      {/* Modal - More Formal and Functional */}
+      {/* Modal */}
       {isOpen && mounted && createPortal(
         <div 
           className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300"
@@ -100,16 +119,20 @@ export default function ProductActions({ variant = 'vertical' }: Props) {
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
+              {errorLocal && (
+                <div className="p-3 bg-red-50 border border-red-200 text-red-600 rounded-xl text-sm font-semibold">{errorLocal}</div>
+              )}
+
               <div className="flex flex-col gap-1.5">
                 <label className="text-[10px] font-black uppercase text-slate-400 ml-1 tracking-wider">{t("modals.product_name_label", { defaultValue: 'Product Name' })}</label>
                 <input
                   type="text"
                   value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  onChange={(e) => { setName(e.target.value); setFieldErrors(prev => ({ ...prev, name: "" })) }}
                   placeholder={t("modals.product_name_placeholder", { defaultValue: 'Ex: Apples' })}
-                  required
-                  className="w-full h-11 bg-slate-50 border-2 border-slate-100 rounded-xl px-6 text-slate-800 font-bold placeholder:text-slate-400 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-400 transition-all"
+                  className={`w-full h-11 bg-slate-50 border-2 ${fieldErrors.name ? 'border-red-300 ring-4 ring-red-500/10' : 'border-slate-100'} rounded-xl px-6 text-slate-800 font-bold placeholder:text-slate-400 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-400 transition-all`}
                 />
+                {fieldErrors.name && <p className="text-xs font-bold text-red-500 ml-1">{t(`validation.${fieldErrors.name}`, { defaultValue: fieldErrors.name })}</p>}
               </div>
 
               <CustomSelect
@@ -118,10 +141,6 @@ export default function ProductActions({ variant = 'vertical' }: Props) {
                 options={CATEGORIES}
                 onChange={(val) => setCategory(val)}
               />
-
-              {errorLocal && (
-                <p className="text-red-500 text-sm font-semibold ml-1">{errorLocal}</p>
-              )}
 
               <div className="flex gap-4 pt-4">
                 <button
@@ -133,7 +152,7 @@ export default function ProductActions({ variant = 'vertical' }: Props) {
                 </button>
                 <button
                   type="submit"
-                  disabled={isLoading || !name.trim()}
+                  disabled={isLoading}
                   className="flex-[2] bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-2xl shadow-lg shadow-indigo-100 hover:shadow-indigo-200 transition-all duration-200 active:scale-[0.98] cursor-pointer disabled:opacity-50"
                 >
                   {isLoading ? t("common.loading", { defaultValue: 'Loading...' }) : t("common.save", { defaultValue: 'Save' })}

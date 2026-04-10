@@ -203,7 +203,10 @@
     "registering": "Registrando...",
     "new_password": "Nueva Contraseña",
     "confirm_new_password": "Confirmar Nueva Contraseña",
-    "password_rule": "Debe tener más de 8 caracteres",
+    "password_rule_length": "Debe tener más de 8 caracteres",
+    "password_rule_uppercase": "Mínimo una mayúscula",
+    "password_rule_number": "Mínimo un número",
+    "password_rule_symbol": "Mínimo un símbolo (_, -, !, ?...)",
     "leave_blank": "Deja los siguientes campos en blanco si no quieres cambiar tu contraseña actual.",
     "updating": "Actualizando...",
     "save_changes": "Guardar Cambios",
@@ -211,6 +214,9 @@
       "fill_fields": "Por favor, rellena todos los campos",
       "password_length": "La contraseña debe tener más de 8 caracteres",
       "new_password_length": "La nueva contraseña debe tener más de 8 caracteres",
+      "password_uppercase": "La contraseña debe tener al menos una mayúscula",
+      "password_number": "La contraseña debe tener al menos un número",
+      "password_symbol": "La contraseña debe tener al menos un símbolo",
       "passwords_mismatch": "Las contraseñas no coinciden",
       "login_fail": "Error al iniciar sesión",
       "register_fail": "Error al registrarse",
@@ -263,5 +269,21 @@
     "products_detected": "Productos detectados",
     "view_list": "Ver lista",
     "scan_another": "Escanear otra lista"
+  },
+  "validation": {
+    "required_field": "Este campo es obligatorio",
+    "invalid_email": "Introduce una dirección de email válida",
+    "name_too_long": "El nombre no puede superar {{max}} caracteres",
+    "description_too_long": "La descripción no puede superar {{max}} caracteres",
+    "price_positive": "El precio debe ser un número positivo",
+    "price_max": "El precio no puede superar {{max}}€",
+    "quantity_min": "La cantidad debe ser al menos 1",
+    "select_list": "Selecciona al menos una lista",
+    "select_product": "Selecciona un producto",
+    "password_length": "La contraseña debe tener más de 8 caracteres",
+    "password_uppercase": "La contraseña debe tener al menos una mayúscula",
+    "password_number": "La contraseña debe tener al menos un número",
+    "password_symbol": "La contraseña debe tener al menos un símbolo",
+    "passwords_mismatch": "Las contraseñas no coinciden"
   }
 }

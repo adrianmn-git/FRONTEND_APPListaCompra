@@ -1,5 +1,5 @@
 import type { Metadata } from "next"
-import { Poppins } from "next/font/google"
+import { Poppins, Geist } from "next/font/google"
 import "./globals.css"
 import "flag-icons/css/flag-icons.min.css"
 import { ShoppingListProvider } from "@/shopping-list/contexts/ShoppingListContext"
@@ -16,6 +16,10 @@ import NotificationContainer from "@/notifications/components/NotificationContai
 import { NotificationProvider } from "@/notifications/contexts/NotificationContext"
 import { I18nProvider } from "@/i18n/contexts/I18nContext"
 import { AuthProvider } from "@/auth/contexts/AuthContext"
+import { cn } from "@/lib/utils";
+
+const geist = Geist({subsets:['latin'],variable:'--font-sans'});
+
 
 config.autoAddCss = false
 
@@ -32,7 +36,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={poppins.variable}>
+    <html lang="en" className={cn("font-sans", geist.variable)}>
       <body className={`${poppins.className} relative bg-slate-50 min-h-screen antialiased`}>
         <FloatingBackground />
         <I18nProvider>

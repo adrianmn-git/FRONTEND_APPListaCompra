@@ -1,15 +1,10 @@
 "use client"
 
-import React, { createContext, useState, useEffect, useCallback } from 'react';
-import es from '../translations/es.json';
-import en from '../translations/en.json';
-import ca from '../translations/ca.json';
+import React, { createContext, useCallback } from 'react';
+import { useTranslation, I18nextProvider } from 'react-i18next';
+import i18nInstance from '../config';
 
 export type Language = 'es' | 'en' | 'ca';
-
-const translations = { es, en, ca };
-
-type TranslationData = typeof es;
 
 interface I18nContextType {
   language: Language;
@@ -20,61 +15,30 @@ interface I18nContextType {
 const I18nContext = createContext<I18nContextType | undefined>(undefined);
 
 export const I18nProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [language, setLanguageState] = useState<Language>('en');
+  const { t: i18nextT } = useTranslation(undefined, { i18n: i18nInstance });
 
-  useEffect(() => {
-    const savedLang = localStorage.getItem('language') as Language;
-    if (savedLang && ['es', 'en', 'ca'].includes(savedLang)) {
-      setLanguageState(savedLang);
-    } else {
-      const browserLang = navigator.language.split('-')[0] as Language;
-      if (['es', 'en', 'ca'].includes(browserLang)) {
-        setLanguageState(browserLang);
-      }
-    }
-  }, []);
+  const language = (i18nInstance.language?.split('-')[0] || (i18nInstance.options.fallbackLng as any)?.[0] || 'en') as Language;
 
   const setLanguage = useCallback((lang: Language) => {
-    setLanguageState(lang);
-    localStorage.setItem('language', lang);
+    i18nInstance.changeLanguage(lang);
   }, []);
 
+  // Bridge function: maintains backward compatibility with existing t('section.key', { param }) calls
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const tAny = i18nextT as any;
   const t = useCallback((key: string, params?: Record<string, string | number>): string => {
-    const keys = key.split('.');
-    let result: any = translations[language];
-
-    // Extract defaultValue before processing
-    const defaultValue = params?.defaultValue as string | undefined;
-
-    for (const k of keys) {
-      if (result && result[k]) {
-        result = result[k];
-      } else {
-        // Use defaultValue fallback, then raw key
-        return defaultValue ? String(defaultValue) : key;
-      }
-    }
-
-    if (typeof result !== 'string') {
-      return defaultValue ? String(defaultValue) : key;
-    }
-
-    // Handle interpolation {{name}} (exclude defaultValue)
     if (params) {
-      Object.entries(params).forEach(([paramKey, value]) => {
-        if (paramKey !== 'defaultValue') {
-          result = result.replace(new RegExp(`{{${paramKey}}}`, 'g'), String(value));
-        }
-      });
+      return tAny(key, params) as string;
     }
-
-    return result;
-  }, [language]);
+    return tAny(key) as string;
+  }, [tAny]);
 
   return (
-    <I18nContext.Provider value={{ language, setLanguage, t }}>
-      {children}
-    </I18nContext.Provider>
+    <I18nextProvider i18n={i18nInstance}>
+      <I18nContext.Provider value={{ language, setLanguage, t }}>
+        {children}
+      </I18nContext.Provider>
+    </I18nextProvider>
   );
 };
 
