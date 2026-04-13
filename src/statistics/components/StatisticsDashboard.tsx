@@ -9,6 +9,7 @@ import { faListCheck, faCartShopping, faBoxOpen, faStore, faPiggyBank, faChartSi
 import { useI18n } from "@/i18n/hooks/useI18n"
 import { SHOP_CONFIG } from "@/shopping-list/utils/shopConfig"
 import { CATEGORY_CONFIG } from "@/product/utils/categoryConfig"
+import { Skeleton } from "@/components/ui/skeleton"
 
 export default function StatisticsDashboard() {
   const {
@@ -83,9 +84,24 @@ export default function StatisticsDashboard() {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center p-20 opacity-50">
-         <FontAwesomeIcon icon={faChartSimple} className="text-4xl text-slate-300 animate-bounce mb-4" />
-         <p className="text-slate-500 font-bold">{t("common.loading", { defaultValue: "Loading..." })}</p>
+      <div className="w-full max-w-7xl mx-auto space-y-12 pb-20 relative z-10 pt-8">
+        <div className="flex flex-col gap-6">
+          <Skeleton className="w-32 h-4 rounded-full" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <Skeleton className="h-32 rounded-[2rem]" />
+            <Skeleton className="h-32 rounded-[2rem]" />
+            <Skeleton className="h-32 rounded-[2rem]" />
+          </div>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <Skeleton className="h-32 rounded-[2rem]" />
+          <Skeleton className="h-32 rounded-[2rem]" />
+          <Skeleton className="h-32 rounded-[2rem]" />
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <Skeleton className="h-[400px] rounded-[2rem]" />
+          <Skeleton className="h-[400px] rounded-[2rem]" />
+        </div>
       </div>
     )
   }

@@ -1,7 +1,8 @@
 "use client"
 
-import React, { createContext, useState, useCallback } from 'react';
+import React, { createContext, useCallback } from 'react';
 import { Notification, NotificationType } from '../entity/Notification';
+import { toast } from "sonner";
 
 interface NotificationContextType {
   notifications: Notification[];
@@ -14,41 +15,33 @@ interface NotificationContextType {
 const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
 
 export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [notifications, setNotifications] = useState<Notification[]>([]);
-
   const removeNotification = useCallback((id: string) => {
-    setNotifications((prev) => prev.filter((notification) => notification.id !== id));
+    toast.dismiss(id)
   }, []);
 
   const showNotification = useCallback(
     (type: NotificationType, message: string, duration = 5000) => {
-      const id = Math.random().toString(36).substring(2, 9);
-      const newNotification: Notification = { id, type, message, duration };
-
-      setNotifications((prev) => [...prev, newNotification]);
-
-      if (duration !== Infinity) {
-        setTimeout(() => {
-          removeNotification(id);
-        }, duration);
-      }
+      if (type === 'success') toast.success(message, { duration });
+      else if (type === 'error') toast.error(message, { duration });
+      else if (type === 'warning') toast.warning(message, { duration });
+      else toast.info(message, { duration });
     },
-    [removeNotification]
+    []
   );
 
   const success = useCallback(
-    (message: string, duration?: number) => showNotification('success', message, duration),
-    [showNotification]
+    (message: string, duration?: number) => { toast.success(message, { duration }) },
+    []
   );
 
   const error = useCallback(
-    (message: string, duration?: number) => showNotification('error', message, duration),
-    [showNotification]
+    (message: string, duration?: number) => { toast.error(message, { duration }) },
+    []
   );
 
   return (
     <NotificationContext.Provider
-      value={{ notifications, showNotification, removeNotification, success, error }}
+      value={{ notifications: [], showNotification, removeNotification, success, error }}
     >
       {children}
     </NotificationContext.Provider>

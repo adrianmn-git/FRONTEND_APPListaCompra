@@ -17,6 +17,7 @@ import { IconDefinition } from '@fortawesome/fontawesome-svg-core'
 import { useI18n } from '@/i18n/hooks/useI18n'
 import AddProductToListModal from "@/product/components/AddProductToListModal"
 import ProductActions from "@/product/components/ProductActions"
+import { CATEGORY_CONFIG, getCategoryConfig, getCategoryLabel } from "@/product/utils/categoryConfig"
 
 export default function CatalogPage() {
   const router = useRouter()
@@ -28,32 +29,7 @@ export default function CatalogPage() {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([])
   const [addingProduct, setAddingProduct] = useState<Product | null>(null)
 
-  const CATEGORY_MAP: Record<string, { label: string; icon: IconDefinition; color: string; gradient: string }> = {
-    fruit: { label: t("categories.fruit", { defaultValue: 'Fruit' }), icon: faAppleWhole, color: 'text-red-500', gradient: 'from-orange-400 to-red-500' },
-    vegetables: { label: t("categories.fruit", { defaultValue: 'Vegetables' }), icon: faCarrot, color: 'text-emerald-500', gradient: 'from-emerald-400 to-teal-500' },
-    meat: { label: t("categories.meat", { defaultValue: 'Meat' }), icon: faDrumstickBite, color: 'text-rose-600', gradient: 'from-rose-500 to-red-600' },
-    fish: { label: t("categories.meat", { defaultValue: 'Fish' }), icon: faFish, color: 'text-blue-500', gradient: 'from-sky-400 to-blue-500' },
-    dairy: { label: t("categories.dairy", { defaultValue: 'Dairy' }), icon: faGlassWater, color: 'text-indigo-500', gradient: 'from-indigo-400 to-violet-500' },
-    eggs: { label: t("categories.dairy", { defaultValue: 'Eggs' }), icon: faEgg, color: 'text-amber-500', gradient: 'from-yellow-400 to-amber-500' },
-    bread: { label: t("categories.bread", { defaultValue: 'Bread' }), icon: faBreadSlice, color: 'text-amber-600', gradient: 'from-amber-500 to-orange-500' },
-    cereals: { label: t("categories.canned", { defaultValue: 'Canned & Grains' }), icon: faBowlFood, color: 'text-stone-500', gradient: 'from-stone-400 to-neutral-500' },
-    pasta_rice: { label: t("categories.canned", { defaultValue: 'Pasta & Rice' }), icon: faUtensils, color: 'text-amber-700', gradient: 'from-amber-600 to-orange-700' },
-    legumes: { label: t("categories.canned", { defaultValue: 'Legumes' }), icon: faSeedling, color: 'text-green-600', gradient: 'from-lime-400 to-green-600' },
-    frozen: { label: t("categories.frozen", { defaultValue: 'Frozen' }), icon: faIcicles, color: 'text-cyan-500', gradient: 'from-cyan-400 to-blue-500' },
-    canned: { label: t("categories.canned", { defaultValue: 'Canned' }), icon: faBoxArchive, color: 'text-slate-500', gradient: 'from-slate-400 to-zinc-500' },
-    snacks: { label: t("categories.snacks", { defaultValue: 'Snacks' }), icon: faCookie, color: 'text-orange-500', gradient: 'from-orange-400 to-rose-500' },
-    sweets: { label: t("categories.sweets", { defaultValue: 'Sweets' }), icon: faCandyCane, color: 'text-pink-500', gradient: 'from-pink-400 to-fuchsia-500' },
-    sauces: { label: t("categories.sauces", { defaultValue: 'Sauces' }), icon: faJar, color: 'text-red-700', gradient: 'from-red-500 to-red-700' },
-    spices: { label: t("categories.spices", { defaultValue: 'Spices' }), icon: faPepperHot, color: 'text-orange-600', gradient: 'from-orange-500 to-red-600' },
-    oil_vinegar: { label: t("categories.oil_vinegar", { defaultValue: 'Oil & Vinegar' }), icon: faOilCan, color: 'text-yellow-600', gradient: 'from-yellow-400 to-amber-500' },
-    drinks: { label: t("categories.drinks", { defaultValue: 'Drinks' }), icon: faGlassWhiskey, color: 'text-purple-500', gradient: 'from-violet-400 to-purple-600' },
-    alcohol: { label: t("categories.drinks", { defaultValue: 'Alcohol' }), icon: faWineGlass, color: 'text-purple-700', gradient: 'from-purple-500 to-fuchsia-700' },
-    cleaning: { label: t("categories.cleaning", { defaultValue: 'Cleaning' }), icon: faBroom, color: 'text-blue-400', gradient: 'from-sky-300 to-blue-500' },
-    hygiene: { label: t("categories.hygiene", { defaultValue: 'Hygiene' }), icon: faSoap, color: 'text-teal-500', gradient: 'from-teal-400 to-emerald-500' },
-    baby: { label: t("categories.baby", { defaultValue: 'Baby' }), icon: faBaby, color: 'text-sky-400', gradient: 'from-sky-300 to-cyan-500' },
-    pets: { label: t("categories.pets", { defaultValue: 'Pets' }), icon: faPaw, color: 'text-stone-600', gradient: 'from-stone-500 to-neutral-700' },
-    other: { label: t("categories.other", { defaultValue: 'Other' }), icon: faBox, color: 'text-slate-400', gradient: 'from-slate-400 to-slate-600' },
-  }
+
 
   useEffect(() => {
     loadProducts()
@@ -85,9 +61,7 @@ export default function CatalogPage() {
     return result.sort((a, b) => a.name.localeCompare(b.name))
   }, [products, searchQuery, selectedCategories])
 
-  const getCategoryConfig = (cat: string) => {
-    return CATEGORY_MAP[cat] || { label: cat, icon: faBox, color: 'text-slate-400', gradient: 'from-slate-400 to-slate-600' }
-  }
+
 
   // Calculate dynamic backgrounds
   const dynamicBg1 = selectedCategories.length > 0 ? getCategoryConfig(selectedCategories[0]).gradient : 'from-indigo-300/40 to-purple-400/20';
@@ -174,7 +148,7 @@ export default function CatalogPage() {
             </div>
             
             <div className="flex flex-wrap items-center gap-2.5 px-1 pb-1">
-            {Object.entries(CATEGORY_MAP).map(([catId, config]) => {
+            {Object.entries(CATEGORY_CONFIG).map(([catId, config]) => {
               const isSelected = selectedCategories.includes(catId);
               return (
                 <button
@@ -186,8 +160,8 @@ export default function CatalogPage() {
                       : `border-slate-100 bg-slate-50 text-slate-600 hover:border-slate-200 hover:bg-white hover:shadow-sm`
                   }`}
                 >
-                  <FontAwesomeIcon icon={config.icon} className={isSelected ? 'text-white' : config.color} />
-                  {config.label}
+                  <FontAwesomeIcon icon={config.icon} className={isSelected ? 'text-white' : config.text} />
+                  {t(config.i18nKey, { defaultValue: config.defaultLabel })}
                 </button>
               )
             })}
@@ -228,7 +202,7 @@ export default function CatalogPage() {
                           <div className={`absolute inset-0 bg-gradient-to-br ${config.gradient} rounded-2xl blur-md opacity-20 group-hover/badge:opacity-40 transition-opacity duration-500`}></div>
                           <div className={`relative w-14 h-14 bg-gradient-to-br ${config.gradient} p-[1px] rounded-2xl shadow-sm transform group-hover:rotate-[8deg] group-hover:scale-110 transition-transform duration-500 ease-out-back flex items-center justify-center`}>
                              <div className="w-full h-full bg-white/95 backdrop-blur-xl rounded-[0.9rem] flex items-center justify-center overflow-hidden">
-                               <FontAwesomeIcon icon={config.icon} className={`text-xl ${config.color}`} />
+                               <FontAwesomeIcon icon={config.icon} className={`text-xl ${config.text}`} />
                              </div>
                           </div>
                         </div>
@@ -248,7 +222,7 @@ export default function CatalogPage() {
                           {formatName(product.name)}
                         </h3>
                         <p className="text-[10px] uppercase font-black text-slate-400 tracking-widest mt-1">
-                          {config.label}
+                          {getCategoryLabel(product.category, t)}
                         </p>
                      </div>
                    </div>

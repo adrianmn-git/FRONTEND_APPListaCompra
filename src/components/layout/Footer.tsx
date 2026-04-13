@@ -59,7 +59,7 @@ export default function Footer() {
         </div>
         
         <div className="mt-16 pt-8 border-t border-slate-800/50 flex flex-col md:flex-row justify-between items-center gap-6">
-          <p className="text-slate-500 text-[10px] font-bold uppercase tracking-widest text-center md:text-left">
+          <p suppressHydrationWarning className="text-slate-500 text-[10px] font-bold uppercase tracking-widest text-center md:text-left">
             © {new Date().getFullYear()} ListaCompra Premium. {t("footer.rights", { defaultValue: 'All rights reserved.' })}
           </p>
           <div className="flex items-center gap-6">

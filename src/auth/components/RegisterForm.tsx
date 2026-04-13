@@ -8,6 +8,10 @@ import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { useI18n } from "../../i18n/hooks/useI18n";
 import { registerSchema } from "../entity/schemas";
 import { ZodError } from "zod";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 export const RegisterForm = () => {
     const { register } = useAuth();
@@ -67,16 +71,18 @@ export const RegisterForm = () => {
     };
 
     const inputClass = (field: string) =>
-        `w-full bg-white border-2 ${fieldErrors[field] ? 'border-red-300 ring-4 ring-red-500/10' : 'border-slate-200'} text-slate-800 text-sm rounded-2xl focus:ring-4 focus:ring-emerald-500/20 focus:border-emerald-500 block p-3.5 transition-all outline-none font-medium shadow-sm`;
-
+        cn(
+            "h-12 px-3.5 bg-white border-2 text-slate-800 text-sm rounded-2xl transition-all outline-none font-medium placeholder:text-slate-400 shadow-sm",
+            fieldErrors[field] ? "border-red-300 focus-visible:ring-4 focus-visible:ring-red-500/10 focus-visible:border-red-500" : "border-slate-200 focus-visible:ring-4 focus-visible:ring-emerald-500/20 focus-visible:border-emerald-500"
+        );
     return (
         <form onSubmit={handleSubmit} className="flex flex-col gap-4 mt-6">
             {error && <div className="p-4 bg-red-50 border border-red-200 text-red-600 rounded-2xl text-sm font-semibold shadow-sm">{error}</div>}
             
             <div className="grid grid-cols-2 gap-4">
                 <div className="flex flex-col gap-2">
-                    <label htmlFor="first_name" className="text-xs font-bold text-slate-700 ml-1 uppercase tracking-wider">{t("auth.first_name", { defaultValue: "Nombre" })}</label>
-                    <input
+                    <Label htmlFor="first_name" className="text-xs font-bold text-slate-700 ml-1 uppercase tracking-wider">{t("auth.first_name", { defaultValue: "Nombre" })}</Label>
+                    <Input
                         id="first_name"
                         name="first_name"
                         type="text"
@@ -87,8 +93,8 @@ export const RegisterForm = () => {
                     {fieldErrors.first_name && <p className="text-xs font-bold text-red-500 ml-1">{t(`validation.${fieldErrors.first_name}`, { defaultValue: fieldErrors.first_name })}</p>}
                 </div>
                 <div className="flex flex-col gap-2">
-                    <label htmlFor="last_name" className="text-xs font-bold text-slate-700 ml-1 uppercase tracking-wider">{t("auth.last_name", { defaultValue: "Apellidos" })}</label>
-                    <input
+                    <Label htmlFor="last_name" className="text-xs font-bold text-slate-700 ml-1 uppercase tracking-wider">{t("auth.last_name", { defaultValue: "Apellidos" })}</Label>
+                    <Input
                         id="last_name"
                         name="last_name"
                         type="text"
@@ -101,8 +107,8 @@ export const RegisterForm = () => {
             </div>
 
             <div className="flex flex-col gap-2">
-                <label htmlFor="email" className="text-xs font-bold text-slate-700 ml-1 uppercase tracking-wider">{t("auth.email", { defaultValue: "Email" })}</label>
-                <input
+                <Label htmlFor="email" className="text-xs font-bold text-slate-700 ml-1 uppercase tracking-wider">{t("auth.email", { defaultValue: "Email" })}</Label>
+                <Input
                     id="email"
                     name="email"
                     type="email"
@@ -114,20 +120,20 @@ export const RegisterForm = () => {
             </div>
 
             <div className="flex flex-col gap-2 relative">
-                <label htmlFor="password" className="text-xs font-bold text-slate-700 ml-1 uppercase tracking-wider">{t("auth.password", { defaultValue: "Contraseña" })}</label>
+                <Label htmlFor="password" className="text-xs font-bold text-slate-700 ml-1 uppercase tracking-wider">{t("auth.password", { defaultValue: "Contraseña" })}</Label>
                 <div className="relative">
-                    <input
+                    <Input
                         id="password"
                         name="password"
                         type={showPassword ? "text" : "password"}
                         value={formData.password}
                         onChange={handleChange}
-                        className={`${inputClass("password")} pr-12`}
+                        className={cn(inputClass("password"), "pr-12")}
                     />
                     <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute inset-y-0 right-0 flex items-center pr-4 text-slate-400 hover:text-emerald-600 transition-colors"
+                        className="absolute inset-y-0 right-0 flex items-center pr-4 text-slate-400 hover:text-emerald-600 transition-colors cursor-pointer"
                     >
                         <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
                     </button>
@@ -150,20 +156,20 @@ export const RegisterForm = () => {
             </div>
             
             <div className="flex flex-col gap-2 relative">
-                <label htmlFor="confirmPassword" className="text-xs font-bold text-slate-700 ml-1 uppercase tracking-wider">{t("auth.confirm_password", { defaultValue: "Confirmar Contraseña" })}</label>
+                <Label htmlFor="confirmPassword" className="text-xs font-bold text-slate-700 ml-1 uppercase tracking-wider">{t("auth.confirm_password", { defaultValue: "Confirmar Contraseña" })}</Label>
                 <div className="relative">
-                    <input
+                    <Input
                         id="confirmPassword"
                         name="confirmPassword"
                         type={showConfirmPassword ? "text" : "password"}
                         value={formData.confirmPassword}
                         onChange={handleChange}
-                        className={`${inputClass("confirmPassword")} pr-12`}
+                        className={cn(inputClass("confirmPassword"), "pr-12")}
                     />
                     <button
                         type="button"
                         onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                        className="absolute inset-y-0 right-0 flex items-center pr-4 text-slate-400 hover:text-emerald-600 transition-colors"
+                        className="absolute inset-y-0 right-0 flex items-center pr-4 text-slate-400 hover:text-emerald-600 transition-colors cursor-pointer"
                     >
                         <FontAwesomeIcon icon={showConfirmPassword ? faEyeSlash : faEye} />
                     </button>
@@ -171,7 +177,7 @@ export const RegisterForm = () => {
                 {fieldErrors.confirmPassword && <p className="text-xs font-bold text-red-500 ml-1">{t(`validation.${fieldErrors.confirmPassword}`, { defaultValue: fieldErrors.confirmPassword })}</p>}
             </div>
 
-            <button
+            <Button
                 type="submit"
                 disabled={
                     loading || 
@@ -182,10 +188,10 @@ export const RegisterForm = () => {
                         !/[^\p{L}\p{N}\s]/u.test(formData.password ?? "")
                     ))
                 }
-                className="mt-4 w-full text-white bg-emerald-500 hover:bg-emerald-600 focus:ring-4 focus:outline-none focus:ring-emerald-300 font-bold rounded-2xl text-base px-5 py-4 text-center transition-all duration-300 shadow-lg shadow-emerald-500/30 disabled:opacity-50 hover:-translate-y-1 active:translate-y-0"
+                className="mt-4 w-full h-12 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-2xl text-base px-5 py-4 transition-all duration-300 shadow-lg shadow-emerald-500/30 active:scale-95"
             >
                 {loading ? t("auth.registering", { defaultValue: "Registrando..." }) : t("auth.register", { defaultValue: "Registrarse" })}
-            </button>
+            </Button>
         </form>
     );
 };

@@ -1,6 +1,6 @@
 "use client"
 
-import React, { createContext, useCallback } from 'react';
+import React, { createContext, useCallback, useEffect } from 'react';
 import { useTranslation, I18nextProvider } from 'react-i18next';
 import i18nInstance from '../config';
 
@@ -15,13 +15,27 @@ interface I18nContextType {
 const I18nContext = createContext<I18nContextType | undefined>(undefined);
 
 export const I18nProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { t: i18nextT } = useTranslation(undefined, { i18n: i18nInstance });
+  const { t: i18nextT, i18n } = useTranslation(undefined, { i18n: i18nInstance });
 
-  const language = (i18nInstance.language?.split('-')[0] || (i18nInstance.options.fallbackLng as any)?.[0] || 'en') as Language;
+  const rawLanguage = i18n.language || i18nInstance.language || 'en';
+  const language = (rawLanguage.split('-')[0]) as Language;
 
   const setLanguage = useCallback((lang: Language) => {
     i18nInstance.changeLanguage(lang);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('i18nextLng', lang);
+    }
   }, []);
+
+  useEffect(() => {
+    const savedLang = localStorage.getItem('i18nextLng');
+    const browserLang = navigator.language.split('-')[0];
+    const initialLang = savedLang || browserLang;
+
+    if (['es', 'en', 'ca'].includes(initialLang) && initialLang !== language) {
+      i18nInstance.changeLanguage(initialLang);
+    }
+  }, [language]);
 
   // Bridge function: maintains backward compatibility with existing t('section.key', { param }) calls
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -1,35 +1,24 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React from "react";
 import { useAuth } from "../hooks/useAuth";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useI18n } from "../../i18n/hooks/useI18n";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 export const UserMenu = () => {
     const { user, logout } = useAuth();
-    const [isOpen, setIsOpen] = useState(false);
-    const menuRef = useRef<HTMLDivElement>(null);
     const router = useRouter();
     const { t } = useI18n();
-
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-                setIsOpen(false);
-            }
-        };
-
-        if (isOpen) {
-            document.addEventListener("mousedown", handleClickOutside);
-        } else {
-            document.removeEventListener("mousedown", handleClickOutside);
-        }
-
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-        };
-    }, [isOpen]);
 
     if (!user) {
         return (
@@ -50,48 +39,40 @@ export const UserMenu = () => {
         );
     }
 
-    // Obtenemos las dos primeras letras del nombre, o la primera del nombre y primera del apellido.
     const initials = (user.first_name?.charAt(0) || "") + (user.last_name?.charAt(0) || "");
 
     return (
-        <div className="relative" ref={menuRef}>
-            <button
-                onClick={() => setIsOpen(!isOpen)}
-                className="flex items-center justify-center w-10 h-10 rounded-[1.2rem] bg-gradient-to-br from-indigo-500 to-purple-600 text-white font-black uppercase hover:scale-105 transition-all duration-300 shadow-lg shadow-indigo-500/30 border border-indigo-400 focus:outline-none focus:ring-4 focus:ring-indigo-500/30 active:scale-95"
-            >
-                {initials || "U"}
-            </button>
-
-            {isOpen && (
-                <div className="absolute right-0 mt-3 w-56 bg-white/70 backdrop-blur-xl rounded-2xl shadow-xl shadow-slate-200/50 py-2 z-50 border border-white animate-in fade-in slide-in-from-top-2 duration-200">
-                    <div className="px-5 py-3 border-b border-slate-100/50 mb-2">
-                        <p className="text-sm font-black text-slate-800 truncate">
-                            {user.first_name} {user.last_name}
-                        </p>
-                        <p className="text-xs font-semibold text-slate-400 truncate mt-0.5">{user.email}</p>
-                    </div>
-                    
-                    <button
-                        onClick={() => {
-                            setIsOpen(false);
-                            router.push("/profile");
-                        }}
-                        className="w-full text-left flex items-center px-5 py-2.5 text-sm font-bold text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
-                    >
-                        {t("auth.profile", { defaultValue: "Mi Perfil" })}
-                    </button>
-                    
-                    <button
-                        onClick={() => {
-                            setIsOpen(false);
-                            logout();
-                        }}
-                        className="w-full text-left flex items-center px-5 py-2.5 text-sm font-bold text-red-500 hover:bg-red-50 hover:text-red-600 transition-colors mt-1"
-                    >
-                        {t("auth.logout", { defaultValue: "Cerrar Sesión" })}
-                    </button>
-                </div>
-            )}
-        </div>
+        <DropdownMenu>
+            <DropdownMenuTrigger className="focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/30 rounded-[1.2rem] hover:scale-105 transition-all duration-300 active:scale-95 shadow-lg shadow-indigo-500/30 border-none outline-none">
+                <Avatar className="w-10 h-10 rounded-[1.2rem] border border-indigo-400 bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-none">
+                    <AvatarFallback className="bg-transparent text-white font-black uppercase shadow-none text-sm tracking-wider">
+                        {initials || "U"}
+                    </AvatarFallback>
+                </Avatar>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56 rounded-2xl shadow-xl shadow-slate-200/50 p-2 z-[20000]">
+                <DropdownMenuLabel className="px-3 py-2 flex flex-col font-normal">
+                    <span className="text-sm font-black text-slate-800 truncate">
+                        {user.first_name} {user.last_name}
+                    </span>
+                    <span className="text-xs font-semibold text-slate-400 truncate mt-0.5">
+                        {user.email}
+                    </span>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator className="bg-slate-100/60 -mx-2 my-1" />
+                <DropdownMenuItem 
+                    onClick={() => router.push("/profile")}
+                    className="cursor-pointer px-3 py-2.5 text-sm font-bold text-slate-600 focus:bg-indigo-50 focus:text-indigo-600 rounded-xl transition-colors"
+                >
+                    {t("auth.profile", { defaultValue: "Mi Perfil" })}
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                    onClick={logout}
+                    className="cursor-pointer px-3 py-2.5 text-sm font-bold text-red-500 focus:bg-red-50 focus:text-red-600 rounded-xl transition-colors mt-1"
+                >
+                    {t("auth.logout", { defaultValue: "Cerrar Sesión" })}
+                </DropdownMenuItem>
+            </DropdownMenuContent>
+        </DropdownMenu>
     );
 };

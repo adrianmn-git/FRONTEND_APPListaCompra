@@ -1,6 +1,5 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
-import LanguageDetector from 'i18next-browser-languagedetector';
 
 import enTranslation from './translations/en/en.json';
 import esTranslation from './translations/es/es.json';
@@ -14,13 +13,7 @@ export const resources = {
   ca: { translation: caTranslation },
 } as const;
 
-const isBrowser = typeof window !== 'undefined';
-
 const i18nInstance = i18n;
-
-if (isBrowser) {
-  i18nInstance.use(LanguageDetector);
-}
 
 i18nInstance
   .use(initReactI18next)
@@ -32,11 +25,6 @@ i18nInstance
     interpolation: {
       escapeValue: false,
     },
-    detection: isBrowser ? {
-      order: ['localStorage', 'navigator', 'htmlTag'],
-      caches: ['localStorage'],
-      lookupLocalStorage: 'i18nextLng',
-    } : undefined,
     react: {
       useSuspense: false, //ssr
     }

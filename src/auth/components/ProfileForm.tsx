@@ -8,6 +8,10 @@ import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { useI18n } from "../../i18n/hooks/useI18n";
 import { profileSchema } from "../entity/schemas";
 import { ZodError } from "zod";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 export const ProfileForm = () => {
     const { user, updateProfile } = useAuth();
@@ -89,7 +93,10 @@ export const ProfileForm = () => {
     if (!user) return null;
 
     const inputClass = (field: string) =>
-        `w-full bg-slate-50 border-2 ${fieldErrors[field] ? 'border-red-300 ring-4 ring-red-500/10' : 'border-slate-200'} text-slate-800 text-sm rounded-2xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 block p-3.5 transition-all outline-none font-medium shadow-sm`;
+        cn(
+            "h-12 px-3.5 bg-slate-50 border-2 text-slate-800 text-sm rounded-2xl transition-all outline-none font-medium shadow-sm",
+            fieldErrors[field] ? "border-red-300 focus-visible:ring-4 focus-visible:ring-red-500/10 focus-visible:border-red-500" : "border-slate-200 focus-visible:ring-4 focus-visible:ring-indigo-500/20 focus-visible:border-indigo-500"
+        );
 
     return (
         <form onSubmit={handleSubmit} className="flex flex-col gap-5">
@@ -98,8 +105,8 @@ export const ProfileForm = () => {
             
             <div className="grid grid-cols-2 gap-5">
                 <div className="flex flex-col gap-2">
-                    <label htmlFor="first_name" className="text-xs font-bold text-slate-700 ml-1 uppercase tracking-wider">{t("auth.first_name", { defaultValue: "Nombre" })}</label>
-                    <input
+                    <Label htmlFor="first_name" className="text-xs font-bold text-slate-700 ml-1 uppercase tracking-wider">{t("auth.first_name", { defaultValue: "Nombre" })}</Label>
+                    <Input
                         id="first_name"
                         name="first_name"
                         type="text"
@@ -110,8 +117,8 @@ export const ProfileForm = () => {
                     {fieldErrors.first_name && <p className="text-xs font-bold text-red-500 ml-1">{t(`validation.${fieldErrors.first_name}`, { defaultValue: fieldErrors.first_name })}</p>}
                 </div>
                 <div className="flex flex-col gap-2">
-                    <label htmlFor="last_name" className="text-xs font-bold text-slate-700 ml-1 uppercase tracking-wider">{t("auth.last_name", { defaultValue: "Apellidos" })}</label>
-                    <input
+                    <Label htmlFor="last_name" className="text-xs font-bold text-slate-700 ml-1 uppercase tracking-wider">{t("auth.last_name", { defaultValue: "Apellidos" })}</Label>
+                    <Input
                         id="last_name"
                         name="last_name"
                         type="text"
@@ -124,8 +131,8 @@ export const ProfileForm = () => {
             </div>
 
             <div className="flex flex-col gap-2">
-                <label htmlFor="email" className="text-xs font-bold text-slate-700 ml-1 uppercase tracking-wider">{t("auth.email", { defaultValue: "Email" })}</label>
-                <input
+                <Label htmlFor="email" className="text-xs font-bold text-slate-700 ml-1 uppercase tracking-wider">{t("auth.email", { defaultValue: "Email" })}</Label>
+                <Input
                     id="email"
                     name="email"
                     type="email"
@@ -143,27 +150,27 @@ export const ProfileForm = () => {
             </div>
 
             <div className="flex flex-col gap-2 relative">
-                <label htmlFor="password" className="text-xs font-bold text-slate-700 ml-1 uppercase tracking-wider">{t("auth.new_password", { defaultValue: "Nueva Contraseña" })}</label>
+                <Label htmlFor="password" className="text-xs font-bold text-slate-700 ml-1 uppercase tracking-wider">{t("auth.new_password", { defaultValue: "Nueva Contraseña" })}</Label>
                 <div className="relative">
-                    <input
+                    <Input
                         id="password"
                         name="password"
                         type={showPassword ? "text" : "password"}
                         value={formData.password}
                         onChange={handleChange}
-                        className={`${inputClass("password")} pr-12 placeholder-slate-400`}
+                        className={cn(inputClass("password"), "pr-12 placeholder:text-slate-400")}
                         placeholder="••••••••"
                     />
                     <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute inset-y-0 right-0 flex items-center pr-4 text-slate-400 hover:text-indigo-600 transition-colors"
+                        className="absolute inset-y-0 right-0 flex items-center pr-4 text-slate-400 hover:text-indigo-600 transition-colors cursor-pointer"
                     >
                         <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
                     </button>
                 </div>
                 {fieldErrors.password && <p className="text-xs font-bold text-red-500 ml-1">{t(`validation.${fieldErrors.password}`, { defaultValue: fieldErrors.password })}</p>}
-                <div className={`flex flex-col gap-1 mt-1 ${(formData.password ?? "").length === 0 ? 'hidden' : ''}`}>
+                <div className={cn("flex flex-col gap-1 mt-1", (formData.password ?? "").length === 0 ? 'hidden' : '')}>
                     <p className={`text-xs ml-1 font-bold transition-colors ${(formData.password ?? "").length > 8 ? 'text-emerald-600' : 'text-slate-400'}`}>
                         {(formData.password ?? "").length > 8 ? '✓' : '•'} {t("auth.password_rule_length", { defaultValue: "Debe tener más de 8 caracteres" })}
                     </p>
@@ -180,21 +187,21 @@ export const ProfileForm = () => {
             </div>
             
             <div className="flex flex-col gap-2 relative">
-                <label htmlFor="confirmPassword" className="text-xs font-bold text-slate-700 ml-1 uppercase tracking-wider">{t("auth.confirm_new_password", { defaultValue: "Confirmar Nueva Contraseña" })}</label>
+                <Label htmlFor="confirmPassword" className="text-xs font-bold text-slate-700 ml-1 uppercase tracking-wider">{t("auth.confirm_new_password", { defaultValue: "Confirmar Nueva Contraseña" })}</Label>
                 <div className="relative">
-                    <input
+                    <Input
                         id="confirmPassword"
                         name="confirmPassword"
                         type={showConfirmPassword ? "text" : "password"}
                         value={formData.confirmPassword}
                         onChange={handleChange}
-                        className={`${inputClass("confirmPassword")} pr-12 placeholder-slate-400`}
+                        className={cn(inputClass("confirmPassword"), "pr-12 placeholder:text-slate-400")}
                         placeholder="••••••••"
                     />
                     <button
                         type="button"
                         onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                        className="absolute inset-y-0 right-0 flex items-center pr-4 text-slate-400 hover:text-indigo-600 transition-colors"
+                        className="absolute inset-y-0 right-0 flex items-center pr-4 text-slate-400 hover:text-indigo-600 transition-colors cursor-pointer"
                     >
                         <FontAwesomeIcon icon={showConfirmPassword ? faEyeSlash : faEye} />
                     </button>
@@ -203,7 +210,7 @@ export const ProfileForm = () => {
             </div>
 
             <div className="mt-4 flex justify-end">
-                <button
+                <Button
                     type="submit"
                     disabled={
                         loading || 
@@ -214,10 +221,10 @@ export const ProfileForm = () => {
                             !/[^\p{L}\p{N}\s]/u.test(formData.password ?? "")
                         ))
                     }
-                    className="w-full sm:w-auto text-white bg-indigo-600 hover:bg-indigo-700 focus:ring-4 focus:outline-none focus:ring-indigo-300 font-bold rounded-2xl text-base px-8 py-3.5 text-center transition-all duration-300 shadow-lg shadow-indigo-600/30 disabled:opacity-50 hover:-translate-y-1 active:translate-y-0"
+                    className="w-full sm:w-auto h-12 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-2xl text-base px-8 transition-all duration-300 shadow-lg shadow-indigo-600/30 active:scale-95"
                 >
                     {loading ? t("auth.updating", { defaultValue: "Actualizando..." }) : t("auth.save_changes", { defaultValue: "Guardar Cambios" })}
-                </button>
+                </Button>
             </div>
         </form>
     );

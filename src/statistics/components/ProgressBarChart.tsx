@@ -1,5 +1,7 @@
 import React from "react"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { Progress } from "@/components/ui/progress"
+import { Card, CardContent } from "@/components/ui/card"
 import { useI18n } from "@/i18n/hooks/useI18n"
 
 export interface ProgressBarData {
@@ -20,23 +22,26 @@ export default function ProgressBarChart({ title, data, emptyMessage }: { title:
 
   if (data.length === 0) {
     return (
-      <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100">
-        <h3 className="text-xl font-black text-slate-800 mb-6">{title}</h3>
-        <div className="flex flex-col items-center justify-center py-10">
-          <p className="text-slate-500 font-bold text-lg">{displayEmptyMessage}</p>
-        </div>
-      </div>
+      <Card className="rounded-[2rem] shadow-sm border border-slate-100">
+        <CardContent className="p-8">
+          <h3 className="text-xl font-black text-slate-800 mb-6">{title}</h3>
+          <div className="flex flex-col items-center justify-center py-10">
+            <p className="text-slate-500 font-bold text-lg">{displayEmptyMessage}</p>
+          </div>
+        </CardContent>
+      </Card>
     )
   }
 
   const maxCount = Math.max(...data.map(d => d.count))
 
   return (
-    <div className="bg-white p-8 rounded-[2rem] shadow-xl shadow-slate-200/40 ring-1 ring-slate-900/5 transition-all duration-500 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)]">
-      <h3 className="text-xl font-black text-slate-800 tracking-tight mb-8 flex items-center gap-3">
-        <div className="w-2 h-8 bg-indigo-500 rounded-full"></div>
-        {title}
-      </h3>
+    <Card className="rounded-[2rem] shadow-xl shadow-slate-200/40 ring-1 ring-slate-900/5 transition-all duration-500 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] border-transparent p-0">
+      <CardContent className="p-8">
+        <h3 className="text-xl font-black text-slate-800 tracking-tight mb-8 flex items-center gap-3">
+          <div className="w-2 h-8 bg-indigo-500 rounded-full"></div>
+          {title}
+        </h3>
       <div className="space-y-8">
         {data.map((item) => (
           <div key={item.id} className="relative group">
@@ -66,19 +71,15 @@ export default function ProgressBarChart({ title, data, emptyMessage }: { title:
                 </span>
               </div>
             </div>
-            {/* Background track */}
-            <div className="h-3 w-full bg-slate-50 rounded-full overflow-hidden ring-1 ring-slate-100 shadow-inner">
-              {/* Animated fill with subtle gradient */}
-              <div 
-                className={`h-full rounded-full transition-all duration-1000 ease-out-back relative ${item.solidColorClass}`}
-                style={{ width: `${(item.count / maxCount) * 100}%` }}
-              >
-                <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-50"></div>
-              </div>
-            </div>
+            <Progress 
+              value={(item.count / maxCount) * 100} 
+              className="h-3 w-full bg-slate-50 rounded-full overflow-hidden ring-1 ring-slate-100 shadow-inner" 
+              indicatorClassName={`${item.solidColorClass} relative`}
+            />
           </div>
         ))}
       </div>
-    </div>
+      </CardContent>
+    </Card>
   )
 }
